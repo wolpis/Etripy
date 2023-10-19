@@ -23,6 +23,10 @@ class Analysis(EtriRequest):
         """
         ### - 언어 분석
         문어체 언어분석 및 구어체 언어분석 결과를 제공합니다.
+
+        #### Parameter
+        `analysis_code` : 요청할 분석 코드 (AnalysisCode 클래스 사용 권장)\n
+        `text` : 분석할 자연어 문장으로서 UTF-8 인코딩된 텍스트만 지원
         """
         data = {
             "argument": {"analysis_code": analysis_code, "text": text},
@@ -33,6 +37,9 @@ class Analysis(EtriRequest):
         """
         ### - 문장 패러프레이즈 인식
         문장 패러프레이즈 인식 API는 두 개의 문장이 동등한 의미를 가지는지 여부를 판별합니다.
+
+        #### Parameter
+        `sentences` : 분석할려는 문장에 대한 텍스트 (두 문장만 입력해주세요.)
         """
         if len(sentences) != 2:
             raise SentencesException("두 문장만 입력해주세요. 현재 입력한 문장 수 : " + len(sentences))
@@ -45,6 +52,9 @@ class Analysis(EtriRequest):
         """
         ### - 어휘 정보
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘의 정보를 분석하는 기술로서 입력된 어휘에 대한 관련 제공합니다.
+
+        #### Parameter
+        `word` : 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
         data = {
             "argument": {"word": word},
@@ -55,6 +65,9 @@ class Analysis(EtriRequest):
         """
         ### - 동음이의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 동음이의어(소리는 같으나 뜻이 다른 단어) 사전 정보를 조회하는 API로 입력된 어휘의 동음이의어 정보를 제공합니다.
+        
+        #### Parameter
+        `word` : 동음이의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
         data = {
             "argument": {"word": word},
@@ -65,6 +78,10 @@ class Analysis(EtriRequest):
         """
         ### - 다의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 다의어(두 가지 이상의 뜻을 가진 단어) 사전 정보를 조회하는 API로 입력된 어휘의 다의어 정보를 제공합니다.
+        
+        #### Parameter
+        `word` : 다의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
+        `homonym_code` : 다의어를 조회할 어휘의 동음이의어 코드 (필수 X)
         """
         if homonym_code:
             data = {
@@ -90,6 +107,12 @@ class Analysis(EtriRequest):
         """
         ### - 어휘 간 유사도 분석
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘 간 거리 정보를 분석하는 기술로서 입력된 여휘간 유사도 결과를 제공합니다.
+        
+        #### Parameter
+        `first_word` : 비교 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
+        `first_sense_id` : 첫 번째 어휘의 의미 코드 (필수 X)\n
+        `second_word` : 비교 분석 대상 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
+        `second_sense_id` : 두 번째 어휘의 의미 코드 (필수 X)\n
         """
         data = {
             "argument": {"first_word": first_word, "second_word": second_word},
@@ -104,6 +127,9 @@ class Analysis(EtriRequest):
         """
         ### - 개체 연결(NE Linking)
         개체 연결(entity linking) API는 문장 내에서 인식된 개체 멘션(entity mention)을 지식베이스의 개체(entity)와 연결하는 기술을 제공합니다.
+
+        #### Parameter
+        `contents` : 분석할 문단
         """
         data = {
             "argument": {"contents": contents},
@@ -116,6 +142,9 @@ class Analysis(EtriRequest):
         """
         ### - 상호참조 해결
         상호참조 해결(coreference resolution) API는 어떤 개체에 대한 여러 표현들이 이루고 있는 참조관계를 밝히는 기술을 제공합니다.
+
+        #### Parameter
+        `text` : 분석할 문단
         """
         data = {
             "argument": {"text": text},
@@ -139,6 +168,9 @@ class QA(EtriRequest):
         """
         ### - 질문분석
         자연어 질문을 분석하여 의미를 이해하고 구조화하는 기술을 제공합니다.
+
+        #### Parameter
+        `text` : 분석할 질문 Text 로서 UTF-8 인코딩된 텍스트만 지원합니다.
         """
         data = {
             "argument": {"text": text},
@@ -149,6 +181,10 @@ class QA(EtriRequest):
         """
         ### - 기계독해
         자연어로 쓰여진 단락과 사용자 질문이 주어졌을 때, 딥러닝 기술을 이용하여 단락 중 정답에 해당하는 영역을 찾는 기술을 제공합니다.
+        
+        #### Parameter
+        `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
+        `passage` : 질문의 답이 포함된 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
         data = {
             "argument": {"passage": passage, "question": question},
@@ -159,6 +195,10 @@ class QA(EtriRequest):
         """
         ### - 위키백과 QA
         자연어로 기술된 질문의 의미를 분석하여, 위키백과 문서에서 정답과 신뢰도 및 검색 단락을 추론하여 제공합니다.
+
+        #### Parameter
+        `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
+        `type` : 질문 응답 엔진의 종류 로서 UTF-8 인코딩된 텍스트만 지원 (WikiType 클래스 사용 추천)
         """
         data = {
             "argument": {"type": type, "question": question},
@@ -169,6 +209,9 @@ class QA(EtriRequest):
         """
         ### - 법률 QA
         자연어로 기술된 질문의 의미를 분석하여, 법령문서에서 조 내용을 검색하고 정답을 추론하여 제공합니다.
+
+        #### Parameter
+        `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         """
         data = {
             "argument": {"question": question},
@@ -181,6 +224,10 @@ class QA(EtriRequest):
         """
         ### - 행정문서 QA (문서등록)
         행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
+
+        #### Parameter
+        `upload_file_path` : 업로드 할려는 문서 파일의 경로\n
+        `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)
         """
         file = open(upload_file_path, "rb")
         file_content = file.read()
@@ -197,6 +244,10 @@ class QA(EtriRequest):
         """
         ### - 행정문서 QA (질의응답)
         행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
+
+        #### Parameter
+        `doc_key` : 문서 등록 API에서 리턴 받은 doc key 로서 UTF-8 인코딩된 텍스트만 지원\n
+        `question` : 질문하고자 하는 text로서 UTF-8 인코딩된 텍스트만 지원
         """
         data = {
             "argument": {"doc_key": doc_key, "question": question},
