@@ -21,5 +21,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from etripy.model.etc import *
-from etripy.model.language import *
+from etripy.model.language.analysis import *

@@ -1,13 +1,14 @@
 import json
 import os
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 from etripy.error import SentencesException
 from etripy.http import EtriRequest
 from etripy.model import AnalysisCode, FileType, WikiType
+from etripy.model.language import Analysis
 
 
-class Analysis(EtriRequest):
+class AnalysisClinet(EtriRequest):
     """
     ETRI 언어 처리 및 분석 클라이언트 클래스입니다.
     #### access_key
@@ -19,7 +20,7 @@ class Analysis(EtriRequest):
 
     async def analysis(
         self, text: str, analysis_code: Union[AnalysisCode, str], spoken: bool = False
-    ):
+    ) -> Optional[Analysis]:
         """
         ### - 언어 분석
         문어체 언어분석 및 구어체 언어분석 결과를 제공합니다.
@@ -31,7 +32,10 @@ class Analysis(EtriRequest):
         data = {
             "argument": {"analysis_code": analysis_code, "text": text},
         }
-        return await self.get_analysis_data(data=data, spoken=spoken)
+        result = await self.get_analysis_data(data=data, spoken=spoken)
+        if result["return_object"] == {}:
+            return None
+        return Analysis(data=result, **result["return_object"])
 
     async def paraphrase(self, *sentences: Tuple[str]):
         """
@@ -42,7 +46,7 @@ class Analysis(EtriRequest):
         `sentences` : 분석할려는 문장에 대한 텍스트 (두 문장만 입력해주세요.)
         """
         if len(sentences) != 2:
-            raise SentencesException("두 문장만 입력해주세요. 현재 입력한 문장 수 : " + len(sentences))
+            raise SentencesException(f"두 문장만 입력해주세요.\n현재 입력한 문장 수 : {len(sentences)}")
         data = {
             "argument": {"sentence1": sentences[0], "sentence2": sentences[1]},
         }
@@ -65,7 +69,7 @@ class Analysis(EtriRequest):
         """
         ### - 동음이의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 동음이의어(소리는 같으나 뜻이 다른 단어) 사전 정보를 조회하는 API로 입력된 어휘의 동음이의어 정보를 제공합니다.
-        
+
         #### Parameter
         `word` : 동음이의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
@@ -78,7 +82,7 @@ class Analysis(EtriRequest):
         """
         ### - 다의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 다의어(두 가지 이상의 뜻을 가진 단어) 사전 정보를 조회하는 API로 입력된 어휘의 다의어 정보를 제공합니다.
-        
+
         #### Parameter
         `word` : 다의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `homonym_code` : 다의어를 조회할 어휘의 동음이의어 코드 (필수 X)
@@ -107,7 +111,7 @@ class Analysis(EtriRequest):
         """
         ### - 어휘 간 유사도 분석
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘 간 거리 정보를 분석하는 기술로서 입력된 여휘간 유사도 결과를 제공합니다.
-        
+
         #### Parameter
         `first_word` : 비교 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `first_sense_id` : 첫 번째 어휘의 의미 코드 (필수 X)\n
@@ -154,7 +158,7 @@ class Analysis(EtriRequest):
         )
 
 
-class QA(EtriRequest):
+class QAClient(EtriRequest):
     """
     ETRI 질의응답 클라이언트 클래스입니다.
     #### access_key
@@ -181,7 +185,7 @@ class QA(EtriRequest):
         """
         ### - 기계독해
         자연어로 쓰여진 단락과 사용자 질문이 주어졌을 때, 딥러닝 기술을 이용하여 단락 중 정답에 해당하는 영역을 찾는 기술을 제공합니다.
-        
+
         #### Parameter
         `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `passage` : 질문의 답이 포함된 Text 로서 UTF-8 인코딩된 텍스트만 지원

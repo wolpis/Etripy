@@ -27,12 +27,13 @@ class EtriRequest:
                 if rescode == 200:
                     return await response.json()
                 else:
-                    raise HTTPException(f"Error Code : {rescode}")
+                    data = await response.json()
+                    raise HTTPException(f"Error Code {rescode} : {data['reason']}")
 
     async def get_analysis_data(self, data: Dict[str, str], spoken: bool):
         if spoken:
-            return await self.request(method="POST", endpoint="WiseNLU", data=data)
-        else:
             return await self.request(
                 method="POST", endpoint="/WiseNLU_spoken", data=data
             )
+        else:
+            return await self.request(method="POST", endpoint="/WiseNLU", data=data)
