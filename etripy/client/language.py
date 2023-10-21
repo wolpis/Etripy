@@ -1,11 +1,14 @@
 import json
 import os
-from typing import List, Tuple, Union, Optional
+from typing import List, Optional, Tuple, Union
 
 from etripy.error import SentencesException
 from etripy.http import EtriRequest
 from etripy.model import AnalysisCode, FileType, WikiType
-from etripy.model.language import Analysis
+from etripy.model.language import (AnalysisResult, CoreferenceResult,
+                                   HomonymResult, NELinkingResult,
+                                   ParaphraseResult, PolysemyResult,
+                                   WordRelResult, WordResult)
 
 
 class AnalysisClinet(EtriRequest):
@@ -20,7 +23,7 @@ class AnalysisClinet(EtriRequest):
 
     async def analysis(
         self, text: str, analysis_code: Union[AnalysisCode, str], spoken: bool = False
-    ) -> Optional[Analysis]:
+    ) -> Optional[AnalysisResult]:
         """
         ### - 언어 분석
         문어체 언어분석 및 구어체 언어분석 결과를 제공합니다.
@@ -35,9 +38,9 @@ class AnalysisClinet(EtriRequest):
         result = await self.get_analysis_data(data=data, spoken=spoken)
         if result["return_object"] == {}:
             return None
-        return Analysis(data=result, **result["return_object"])
+        return AnalysisResult(data=result, **result["return_object"])
 
-    async def paraphrase(self, *sentences: Tuple[str]):
+    async def paraphrase(self, *sentences: Tuple[str]) -> Optional[ParaphraseResult]:
         """
         ### - 문장 패러프레이즈 인식
         문장 패러프레이즈 인식 API는 두 개의 문장이 동등한 의미를 가지는지 여부를 판별합니다.
@@ -50,9 +53,12 @@ class AnalysisClinet(EtriRequest):
         data = {
             "argument": {"sentence1": sentences[0], "sentence2": sentences[1]},
         }
-        return await self.request(method="POST", endpoint="/ParaphraseQA", data=data)
+        result = await self.request(method="POST", endpoint="/ParaphraseQA", data=data)
+        if result["return_object"] == {}:
+            return None
+        return ParaphraseResult(data=result, **result["return_object"])
 
-    async def wordinfo(self, word: str):
+    async def wordinfo(self, word: str) -> Optional[WordResult]:
         """
         ### - 어휘 정보
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘의 정보를 분석하는 기술로서 입력된 어휘에 대한 관련 제공합니다.
@@ -63,7 +69,10 @@ class AnalysisClinet(EtriRequest):
         data = {
             "argument": {"word": word},
         }
-        return await self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
+        result = await self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
+        if result["return_object"] == {}:
+            return None
+        return WordResult(data=result)
 
     async def homonym(self, word: str):
         """
@@ -76,7 +85,12 @@ class AnalysisClinet(EtriRequest):
         data = {
             "argument": {"word": word},
         }
-        return await self.request(method="POST", endpoint="/WiseWWN/Homonym", data=data)
+        result = await self.request(
+            method="POST", endpoint="/WiseWWN/Homonym", data=data
+        )
+        if result["return_object"] == {}:
+            return None
+        return HomonymResult(data=result, **result["return_object"])
 
     async def polysemy(self, word: str, homonym_code: str = None):
         """
@@ -97,9 +111,12 @@ class AnalysisClinet(EtriRequest):
                 "request_id": "reserved field",
                 "argument": {"word": word},
             }
-        return await self.request(
+        result = await self.request(
             method="POST", endpoint="/WiseWWN/Polysemy", data=data
         )
+        if result["return_object"] == {}:
+            return None
+        return PolysemyResult(data=result, **result["return_object"])
 
     async def wordrel(
         self,
@@ -125,9 +142,14 @@ class AnalysisClinet(EtriRequest):
             data["argument"]["first_sense_id"] = first_sense_id
         if second_sense_id:
             data["argument"]["second_sense_id"] = second_sense_id
-        return await self.request(method="POST", endpoint="/WiseWWN/WordRel", data=data)
+        result = await self.request(
+            method="POST", endpoint="/WiseWWN/WordRel", data=data
+        )
+        if result["return_object"] == {}:
+            return None
+        return WordRelResult(data=result)
 
-    async def nelinking(self, contents: str):
+    async def nelinking(self, contents: str) -> Optional[List[NELinkingResult]]:
         """
         ### - 개체 연결(NE Linking)
         개체 연결(entity linking) API는 문장 내에서 인식된 개체 멘션(entity mention)을 지식베이스의 개체(entity)와 연결하는 기술을 제공합니다.
@@ -138,11 +160,15 @@ class AnalysisClinet(EtriRequest):
         data = {
             "argument": {"contents": contents},
         }
-        return await self.request(
-            method="POST", endpoint="/WiseWWN/NELinking", data=data
-        )
+        result = await self.request(method="POST", endpoint="/NELinking", data=data)
+        if result["return_object"] == {}:
+            return None
+        return [
+            NELinkingResult(data=result, **result_)
+            for result_ in result["return_object"]
+        ]
 
-    async def coreference(self, text: str):
+    async def coreference(self, text: str) -> Optional[CoreferenceResult]:
         """
         ### - 상호참조 해결
         상호참조 해결(coreference resolution) API는 어떤 개체에 대한 여러 표현들이 이루고 있는 참조관계를 밝히는 기술을 제공합니다.
@@ -153,9 +179,12 @@ class AnalysisClinet(EtriRequest):
         data = {
             "argument": {"text": text},
         }
-        return await self.request(
-            method="POST", endpoint="/WiseWWN/Coreference", data=data
-        )
+        result = await self.request(method="POST", endpoint="/Coreference", data=data)
+        if result["return_object"] == {}:
+            return None
+        result_ = {}
+        result_["entity"] = result["return_object"]["entity"]
+        return CoreferenceResult(data=result, **result_)
 
 
 class QAClient(EtriRequest):
@@ -179,7 +208,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"text": text},
         }
-        return await self.request(method="POST", endpoint="/WiseQAnal", data=data)
+        result = await self.request(method="POST", endpoint="/WiseQAnal", data=data)
 
     async def mrcservlet(self, question: str, passage: str):
         """
@@ -193,7 +222,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"passage": passage, "question": question},
         }
-        return await self.request(method="POST", endpoint="/MRCServlet", data=data)
+        result = await self.request(method="POST", endpoint="/MRCServlet", data=data)
 
     async def wiki(self, type: Union[WikiType, str], question: str):
         """
@@ -207,7 +236,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"type": type, "question": question},
         }
-        return await self.request(method="POST", endpoint="/WikiQA", data=data)
+        result = await self.request(method="POST", endpoint="/WikiQA", data=data)
 
     async def legal(self, question: str):
         """
@@ -220,7 +249,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"question": question},
         }
-        return await self.request(method="POST", endpoint="/LegalQAt", data=data)
+        result = await self.request(method="POST", endpoint="/LegalQAt", data=data)
 
     async def doc_upload(
         self, upload_file_path: str, file_type: Union[FileType, str] = "hwp"
@@ -242,7 +271,7 @@ class QAClient(EtriRequest):
             "json": json.dumps(requestJson),
             "doc_file": (os.path.basename(file.name), file_content),
         }
-        return await self.request(method="POST", endpoint="/DocUpload", data=data)
+        result = await self.request(method="POST", endpoint="/DocUpload", data=data)
 
     async def doc(self, doc_key: str, question: str):
         """
@@ -256,4 +285,4 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"doc_key": doc_key, "question": question},
         }
-        return await self.request(method="POST", endpoint="/DocQA", data=data)
+        result = await self.request(method="POST", endpoint="/DocQA", data=data)

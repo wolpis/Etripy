@@ -240,7 +240,7 @@ class Sentence:
 
 
 @dataclass(frozen=True)
-class Analysis(BaseLanguageEtri):
+class AnalysisResult(BaseLanguageEtri):
     doc_id: Optional[str] = field(repr=True, compare=True, default=None)
     DCT: Optional[str] = field(repr=True, compare=True, default=None)
     category: Optional[str] = field(repr=True, compare=True, default=None)

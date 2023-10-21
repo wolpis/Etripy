@@ -22,3 +22,4 @@ SOFTWARE.
 """
 
 from etripy.model.language.analysis import *
+from etripy.model.language.etc import *
