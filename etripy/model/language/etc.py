@@ -12,11 +12,11 @@ class BaseLanguageEtri:
 @dataclass(frozen=True)
 class ParaphraseResult(BaseLanguageEtri):
     result: Optional[str] = field(repr=True, compare=True, default=None)
-    """"패러프레이즈 분석 결과"""
+    """패러프레이즈 분석 결과"""
 
     @property
     def is_paraphrase(self) -> bool:
-        """ "패러프레이즈 분석 결과"""
+        """패러프레이즈 분석 결과"""
         if self.result == "paraphrase":
             return True
         else:
