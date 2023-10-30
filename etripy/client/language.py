@@ -8,7 +8,7 @@ from etripy.model import AnalysisCode, FileType, WikiType
 from etripy.model.language import (AnalysisResult, CoreferenceResult,
                                    HomonymResult, NELinkingResult,
                                    ParaphraseResult, PolysemyResult,
-                                   WordRelResult, WordResult)
+                                   WiseQAnalResult, WordRelResult, WordResult)
 
 
 class AnalysisClinet(EtriRequest):
@@ -209,6 +209,9 @@ class QAClient(EtriRequest):
             "argument": {"text": text},
         }
         result = await self.request(method="POST", endpoint="/WiseQAnal", data=data)
+        if result["return_object"] == {}:
+            return None
+        return WiseQAnalResult(data=result)
 
     async def mrcservlet(self, question: str, passage: str):
         """

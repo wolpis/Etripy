@@ -23,3 +23,4 @@ SOFTWARE.
 
 from etripy.model.language.analysis import *
 from etripy.model.language.etc import *
+from etripy.model.language.wiseqa import *
