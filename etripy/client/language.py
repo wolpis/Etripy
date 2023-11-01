@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from typing import List, Optional, Tuple, Union
@@ -6,12 +7,14 @@ from etripy.error import SentencesException
 from etripy.http import EtriRequest
 from etripy.model import AnalysisCode, FileType, WikiType
 from etripy.model.language import (AnalysisResult, CoreferenceResult,
-                                   HomonymResult, NELinkingResult,
+                                   DocResult, DocUploadResult, HomonymResult,
+                                   LegalResult, MRCResult, NELinkingResult,
                                    ParaphraseResult, PolysemyResult,
-                                   WiseQAnalResult, WordRelResult, WordResult)
+                                   WiKiResult, WiseQAnalResult, WordRelResult,
+                                   WordResult)
 
 
-class AnalysisClinet(EtriRequest):
+class AnalysisClient(EtriRequest):
     """
     ETRI 언어 처리 및 분석 클라이언트 클래스입니다.
     #### access_key
@@ -197,7 +200,7 @@ class QAClient(EtriRequest):
     def __init__(self, access_key: str) -> None:
         super().__init__(access_key=access_key)
 
-    async def qanal(self, text: str):
+    async def qanal(self, text: str) -> Optional[WiseQAnalResult]:
         """
         ### - 질문분석
         자연어 질문을 분석하여 의미를 이해하고 구조화하는 기술을 제공합니다.
@@ -213,7 +216,7 @@ class QAClient(EtriRequest):
             return None
         return WiseQAnalResult(data=result)
 
-    async def mrcservlet(self, question: str, passage: str):
+    async def mrcservlet(self, question: str, passage: str) -> Optional[MRCResult]:
         """
         ### - 기계독해
         자연어로 쓰여진 단락과 사용자 질문이 주어졌을 때, 딥러닝 기술을 이용하여 단락 중 정답에 해당하는 영역을 찾는 기술을 제공합니다.
@@ -226,8 +229,13 @@ class QAClient(EtriRequest):
             "argument": {"passage": passage, "question": question},
         }
         result = await self.request(method="POST", endpoint="/MRCServlet", data=data)
+        if result["return_object"] == {}:
+            return None
+        return MRCResult(data=result["return_object"]["MRCInfo"])
 
-    async def wiki(self, type: Union[WikiType, str], question: str):
+    async def wiki(
+        self, type: Union[WikiType, str], question: str
+    ) -> Optional[WiKiResult]:
         """
         ### - 위키백과 QA
         자연어로 기술된 질문의 의미를 분석하여, 위키백과 문서에서 정답과 신뢰도 및 검색 단락을 추론하여 제공합니다.
@@ -240,8 +248,11 @@ class QAClient(EtriRequest):
             "argument": {"type": type, "question": question},
         }
         result = await self.request(method="POST", endpoint="/WikiQA", data=data)
+        if result["return_object"] == {}:
+            return None
+        return WiKiResult(data=result)
 
-    async def legal(self, question: str):
+    async def legal(self, question: str) -> Optional[LegalResult]:
         """
         ### - 법률 QA
         자연어로 기술된 질문의 의미를 분석하여, 법령문서에서 조 내용을 검색하고 정답을 추론하여 제공합니다.
@@ -252,31 +263,36 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"question": question},
         }
-        result = await self.request(method="POST", endpoint="/LegalQAt", data=data)
+        result = await self.request(method="POST", endpoint="/LegalQA", data=data)
+        if result["return_object"] == {}:
+            return None
+        return LegalResult(data=result)
 
     async def doc_upload(
-        self, upload_file_path: str, file_type: Union[FileType, str] = "hwp"
-    ):
+        self,
+        upload_file_path: str,
+        file_type: Union[FileType, str] = "hwp",
+        message: bool = False,
+    ) -> Optional[DocUploadResult]:
         """
         ### - 행정문서 QA (문서등록)
         행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
 
         #### Parameter
         `upload_file_path` : 업로드 할려는 문서 파일의 경로\n
-        `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)
+        `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)\n
+        `message` : 파일 업로드 메세지를 출력합니다.
         """
-        file = open(upload_file_path, "rb")
-        file_content = file.read()
-        file.close()
+        if message:
+            print("파일 업로드 중...")
+        result = await self.file_upload(
+            upload_file_path=upload_file_path, file_type=file_type
+        )
+        if result["return_object"] == {}:
+            return None
+        return DocUploadResult(data=result)
 
-        requestJson = {"argument": {"type": file_type}}
-        data = {
-            "json": json.dumps(requestJson),
-            "doc_file": (os.path.basename(file.name), file_content),
-        }
-        result = await self.request(method="POST", endpoint="/DocUpload", data=data)
-
-    async def doc(self, doc_key: str, question: str):
+    async def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
         """
         ### - 행정문서 QA (질의응답)
         행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
@@ -289,3 +305,6 @@ class QAClient(EtriRequest):
             "argument": {"doc_key": doc_key, "question": question},
         }
         result = await self.request(method="POST", endpoint="/DocQA", data=data)
+        if result["return_object"] == {}:
+            return None
+        return DocResult(data=result)

@@ -240,4 +240,5 @@ class WiseQAnalResult(BaseQAEtri):
 
     @property
     def QClassification(self) -> QClassification:
+        """질문분류 정보 객체"""
         return QClassification(**self.data["return_object"]["QClassification"])
