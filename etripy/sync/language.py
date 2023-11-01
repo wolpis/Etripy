@@ -1,7 +1,6 @@
 from typing import List, Optional, Tuple, Union
 
 from etripy.error import AnalysisException, QAException, SentencesException
-from etripy.http import EtriRequest
 from etripy.model import AnalysisCode, FileType, WikiType
 from etripy.model.language import (AnalysisResult, CoreferenceResult,
                                    DocResult, DocUploadResult, HomonymResult,
@@ -9,11 +8,12 @@ from etripy.model.language import (AnalysisResult, CoreferenceResult,
                                    ParaphraseResult, PolysemyResult,
                                    WiKiResult, WiseQAnalResult, WordRelResult,
                                    WordResult)
+from etripy.sync.http import SyncEtriRequest
 
 
-class AnalysisClient(EtriRequest):
+class AnalysisClient(SyncEtriRequest):
     """
-    ETRI 언어 처리 및 분석 클라이언트 클래스입니다.
+    ETRI 언어 처리 및 분석 클라이언트 클래스입니다. (동기 처리)
     #### access_key
     [ETRI 포털사이트](https://aiopen.etri.re.kr/)에서 발급받은 `access_key`를 입력합니다.
     """
@@ -21,7 +21,7 @@ class AnalysisClient(EtriRequest):
     def __init__(self, access_key: str) -> None:
         super().__init__(access_key=access_key)
 
-    async def analysis(
+    def analysis(
         self, text: str, analysis_code: Union[AnalysisCode, str], spoken: bool = False
     ) -> Optional[AnalysisResult]:
         """
@@ -35,7 +35,7 @@ class AnalysisClient(EtriRequest):
         data = {
             "argument": {"analysis_code": analysis_code, "text": text},
         }
-        result = await self.get_analysis_data(data=data, spoken=spoken)
+        result = self.get_analysis_data(data=data, spoken=spoken)
         try:
             if result["return_object"] == {}:
                 return None
@@ -44,7 +44,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return AnalysisResult(data=result, **result["return_object"])
 
-    async def paraphrase(self, *sentences: Tuple[str]) -> Optional[ParaphraseResult]:
+    def paraphrase(self, *sentences: Tuple[str]) -> Optional[ParaphraseResult]:
         """
         ### - 문장 패러프레이즈 인식
         문장 패러프레이즈 인식 API는 두 개의 문장이 동등한 의미를 가지는지 여부를 판별합니다.
@@ -57,7 +57,7 @@ class AnalysisClient(EtriRequest):
         data = {
             "argument": {"sentence1": sentences[0], "sentence2": sentences[1]},
         }
-        result = await self.request(method="POST", endpoint="/ParaphraseQA", data=data)
+        result = self.request(method="POST", endpoint="/ParaphraseQA", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -66,7 +66,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return ParaphraseResult(data=result, **result["return_object"])
 
-    async def wordinfo(self, word: str) -> Optional[WordResult]:
+    def wordinfo(self, word: str) -> Optional[WordResult]:
         """
         ### - 어휘 정보
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘의 정보를 분석하는 기술로서 입력된 어휘에 대한 관련 제공합니다.
@@ -77,7 +77,7 @@ class AnalysisClient(EtriRequest):
         data = {
             "argument": {"word": word},
         }
-        result = await self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
+        result = self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -86,7 +86,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return WordResult(data=result)
 
-    async def homonym(self, word: str):
+    def homonym(self, word: str):
         """
         ### - 동음이의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 동음이의어(소리는 같으나 뜻이 다른 단어) 사전 정보를 조회하는 API로 입력된 어휘의 동음이의어 정보를 제공합니다.
@@ -97,9 +97,7 @@ class AnalysisClient(EtriRequest):
         data = {
             "argument": {"word": word},
         }
-        result = await self.request(
-            method="POST", endpoint="/WiseWWN/Homonym", data=data
-        )
+        result = self.request(method="POST", endpoint="/WiseWWN/Homonym", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -108,7 +106,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return HomonymResult(data=result, **result["return_object"])
 
-    async def polysemy(self, word: str, homonym_code: str = None):
+    def polysemy(self, word: str, homonym_code: str = None):
         """
         ### - 다의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 다의어(두 가지 이상의 뜻을 가진 단어) 사전 정보를 조회하는 API로 입력된 어휘의 다의어 정보를 제공합니다.
@@ -127,9 +125,7 @@ class AnalysisClient(EtriRequest):
                 "request_id": "reserved field",
                 "argument": {"word": word},
             }
-        result = await self.request(
-            method="POST", endpoint="/WiseWWN/Polysemy", data=data
-        )
+        result = self.request(method="POST", endpoint="/WiseWWN/Polysemy", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -138,7 +134,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return PolysemyResult(data=result, **result["return_object"])
 
-    async def wordrel(
+    def wordrel(
         self,
         first_word: str,
         second_word: str,
@@ -162,9 +158,7 @@ class AnalysisClient(EtriRequest):
             data["argument"]["first_sense_id"] = first_sense_id
         if second_sense_id:
             data["argument"]["second_sense_id"] = second_sense_id
-        result = await self.request(
-            method="POST", endpoint="/WiseWWN/WordRel", data=data
-        )
+        result = self.request(method="POST", endpoint="/WiseWWN/WordRel", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -173,7 +167,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return WordRelResult(data=result)
 
-    async def nelinking(self, contents: str) -> Optional[List[NELinkingResult]]:
+    def nelinking(self, contents: str) -> Optional[List[NELinkingResult]]:
         """
         ### - 개체 연결(NE Linking)
         개체 연결(entity linking) API는 문장 내에서 인식된 개체 멘션(entity mention)을 지식베이스의 개체(entity)와 연결하는 기술을 제공합니다.
@@ -184,7 +178,7 @@ class AnalysisClient(EtriRequest):
         data = {
             "argument": {"contents": contents},
         }
-        result = await self.request(method="POST", endpoint="/NELinking", data=data)
+        result = self.request(method="POST", endpoint="/NELinking", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -196,7 +190,7 @@ class AnalysisClient(EtriRequest):
             for result_ in result["return_object"]
         ]
 
-    async def coreference(self, text: str) -> Optional[CoreferenceResult]:
+    def coreference(self, text: str) -> Optional[CoreferenceResult]:
         """
         ### - 상호참조 해결
         상호참조 해결(coreference resolution) API는 어떤 개체에 대한 여러 표현들이 이루고 있는 참조관계를 밝히는 기술을 제공합니다.
@@ -207,7 +201,7 @@ class AnalysisClient(EtriRequest):
         data = {
             "argument": {"text": text},
         }
-        result = await self.request(method="POST", endpoint="/Coreference", data=data)
+        result = self.request(method="POST", endpoint="/Coreference", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -219,9 +213,9 @@ class AnalysisClient(EtriRequest):
         return CoreferenceResult(data=result, **result_)
 
 
-class QAClient(EtriRequest):
+class QAClient(SyncEtriRequest):
     """
-    ETRI 질의응답 클라이언트 클래스입니다.
+    ETRI 질의응답 클라이언트 클래스입니다. (동기 처리)
     #### access_key
     [ETRI 포털사이트](https://aiopen.etri.re.kr/)에서 발급받은 `access_key`를 입력합니다.
     """
@@ -229,7 +223,7 @@ class QAClient(EtriRequest):
     def __init__(self, access_key: str) -> None:
         super().__init__(access_key=access_key)
 
-    async def qanal(self, text: str) -> Optional[WiseQAnalResult]:
+    def qanal(self, text: str) -> Optional[WiseQAnalResult]:
         """
         ### - 질문분석
         자연어 질문을 분석하여 의미를 이해하고 구조화하는 기술을 제공합니다.
@@ -240,7 +234,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"text": text},
         }
-        result = await self.request(method="POST", endpoint="/WiseQAnal", data=data)
+        result = self.request(method="POST", endpoint="/WiseQAnal", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -249,7 +243,7 @@ class QAClient(EtriRequest):
                 raise QAException(result["reason"])
         return WiseQAnalResult(data=result)
 
-    async def mrcservlet(self, question: str, passage: str) -> Optional[MRCResult]:
+    def mrcservlet(self, question: str, passage: str) -> Optional[MRCResult]:
         """
         ### - 기계독해
         자연어로 쓰여진 단락과 사용자 질문이 주어졌을 때, 딥러닝 기술을 이용하여 단락 중 정답에 해당하는 영역을 찾는 기술을 제공합니다.
@@ -261,7 +255,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"passage": passage, "question": question},
         }
-        result = await self.request(method="POST", endpoint="/MRCServlet", data=data)
+        result = self.request(method="POST", endpoint="/MRCServlet", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -270,9 +264,7 @@ class QAClient(EtriRequest):
                 raise QAException(result["reason"])
         return MRCResult(data=result["return_object"]["MRCInfo"])
 
-    async def wiki(
-        self, type: Union[WikiType, str], question: str
-    ) -> Optional[WiKiResult]:
+    def wiki(self, type: Union[WikiType, str], question: str) -> Optional[WiKiResult]:
         """
         ### - 위키백과 QA
         자연어로 기술된 질문의 의미를 분석하여, 위키백과 문서에서 정답과 신뢰도 및 검색 단락을 추론하여 제공합니다.
@@ -284,7 +276,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"type": type, "question": question},
         }
-        result = await self.request(method="POST", endpoint="/WikiQA", data=data)
+        result = self.request(method="POST", endpoint="/WikiQA", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -293,7 +285,7 @@ class QAClient(EtriRequest):
                 raise QAException(result["reason"])
         return WiKiResult(data=result)
 
-    async def legal(self, question: str) -> Optional[LegalResult]:
+    def legal(self, question: str) -> Optional[LegalResult]:
         """
         ### - 법률 QA
         자연어로 기술된 질문의 의미를 분석하여, 법령문서에서 조 내용을 검색하고 정답을 추론하여 제공합니다.
@@ -304,7 +296,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"question": question},
         }
-        result = await self.request(method="POST", endpoint="/LegalQA", data=data)
+        result = self.request(method="POST", endpoint="/LegalQA", data=data)
         try:
             if result["return_object"] == {}:
                 return None
@@ -313,7 +305,7 @@ class QAClient(EtriRequest):
                 raise QAException(result["reason"])
         return LegalResult(data=result)
 
-    async def doc_upload(
+    def doc_upload(
         self,
         upload_file_path: str,
         file_type: Union[FileType, str] = "hwp",
@@ -330,7 +322,7 @@ class QAClient(EtriRequest):
         """
         if message:
             print("파일 업로드 중...")
-        result = await self.file_upload(
+        result = self.file_upload(
             upload_file_path=upload_file_path, file_type=file_type
         )
         try:
@@ -341,7 +333,7 @@ class QAClient(EtriRequest):
                 raise QAException(result["reason"])
         return DocUploadResult(data=result)
 
-    async def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
+    def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
         """
         ### - 행정문서 QA (질의응답)
         행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
@@ -353,7 +345,7 @@ class QAClient(EtriRequest):
         data = {
             "argument": {"doc_key": doc_key, "question": question},
         }
-        result = await self.request(method="POST", endpoint="/DocQA", data=data)
+        result = self.request(method="POST", endpoint="/DocQA", data=data)
         try:
             if result["return_object"] == {}:
                 return None
