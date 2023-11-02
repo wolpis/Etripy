@@ -35,7 +35,7 @@ async def test_wordinfo(analysis: AnalysisClient):
 
 # 동음이의어 정보
 @pytest.mark.asyncio
-async def test_wordinfo(analysis: AnalysisClient):
+async def test_homonym(analysis: AnalysisClient):
     r = await analysis.homonym(word=word_1)
     assert r.data
 
