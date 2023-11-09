@@ -11,7 +11,8 @@
 > **동기 비동기 모두 지원합니다!**<br>
 > OPEN ETRI 언어처리 API의 모든 엔드포인트가 래핑되어 있습니다<br>
 > (추후 음성지능 및 시각지능도 업데이트 예정입니다!)<br>
-> [자세한 사용법은 여기를 참조해주세요!](https://etripy.notion.site/Etripy-b76746d40bef49b984f006cf2ef31437)<br>
+> [자세한 사용법은 여기를 참조해주세요!](https://etripy.notion.site/etripy/Etripy-b76746d40bef49b984f006cf2ef31437)<br>
+
 
 ## Installation
 ```
