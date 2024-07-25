@@ -13,10 +13,7 @@ class ParaphraseResult(BaseLanguageEtri):
     @property
     def is_paraphrase(self) -> bool:
         """패러프레이즈 분석 결과"""
-        if self.result == "paraphrase":
-            return True
-        else:
-            return False
+        return self.result == "paraphrase"
 
 
 ####################### 어휘 정보 #######################
@@ -64,6 +61,8 @@ class WordInfo:
     @property
     def WordInfoList(self) -> List[WordInfoList]:
         """어휘의 상세 정보"""
+        if self.WordInfo is None:
+            return []
         return [WordInfoList(**wi) for wi in self.WordInfo]
 
 
@@ -112,6 +111,8 @@ class HomonymResult(BaseLanguageEtri):
     @property
     def Homonym(self) -> List[Homonym]:
         """동음이의어 정보"""
+        if self.homonym is None:
+            return []
         return [Homonym(**homonym) for homonym in self.homonym]
 
 
@@ -142,6 +143,8 @@ class PolysemyResult(BaseLanguageEtri):
     @property
     def Polysemy(self) -> List[Polysemy]:
         """다의어 정보"""
+        if self.polysemy is None:
+            return []
         return [Polysemy(**polysemy) for polysemy in self.polysemy]
 
 
@@ -168,6 +171,8 @@ class WordRelInfo_:
     @property
     def SimilarityList(self) -> List[SimilarityList]:
         """어휘 간 거리 유사도"""
+        if self.Similarity is None:
+            return []
         return [SimilarityList(**sim) for sim in self.Similarity]
 
 
@@ -216,22 +221,34 @@ class WordRelInfo:
     )
     """두 번째 어휘 정보"""
     WordRelInfo: Optional[Dict[str, Any]] = field(repr=True, compare=True, default=None)
+    """어휘 간 유사도 분석 정보"""
 
     @property
     def FirstWordInfo_(self) -> FirstWordInfo_:
+        """첫 번째 어휘 정보"""
+        if self.FirstWordInfo is None:
+            return FirstWordInfo_()
         return FirstWordInfo_(**self.FirstWordInfo)
 
     @property
     def SecondWordInfo_(self) -> SecondWordInfo_:
+        """두 번째 어휘 정보"""
+        if self.SecondWordInfo is None:
+            return SecondWordInfo_()
         return SecondWordInfo_(**self.SecondWordInfo)
 
     @property
     def WordRelInfo_(self) -> WordRelInfo_:
+        """어휘 간 유사도 분석 정보"""
+        if self.WordRelInfo is None:
+            return WordRelInfo_()
         return WordRelInfo_(**self.WordRelInfo)
 
 
 @dataclass(frozen=True)
 class WordRelResult(BaseLanguageEtri):
+    """어휘 간 유사도 분석 결과"""
+
     @property
     def MetaInfo(self) -> MetaInfo:
         """Open APIs의 정보"""
@@ -243,90 +260,51 @@ class WordRelResult(BaseLanguageEtri):
         return WordRelInfo(**self.data["return_object"]["WWN WordRelInfo"])
 
 
-####################### 어휘관계 분석 #######################
+####################### 개체 연결 #######################
 @dataclass(frozen=True)
 class NELinkingMention:
-    """개체 연결 정보 배열"""
-
-    article_id: Optional[int] = field(repr=True, compare=True, default=None)
-    """연결된 위키피디아 타이틀 ID"""
-    definition: Optional[str] = field(repr=True, compare=True, default=None)
-    """연결 개체의 정의문(위키피디아 첫 문장(단락))"""
     mention: Optional[str] = field(repr=True, compare=True, default=None)
-    """인식된 멘션"""
-    prediction: Optional[bool] = field(repr=True, compare=True, default=None)
-    """이진분류에서의 예측결과(true이면, 개체연결이 올바른 분류라는 의미)"""
-    s_pos: Optional[int] = field(repr=True, compare=True, default=None)
-    """전체 입력에서 인식된 멘션의 시작 위치"""
-    score: Optional[float] = field(repr=True, compare=True, default=None)
-    """개체연결에 대한 점수"""
-    title: Optional[str] = field(repr=True, compare=True, default=None)
-    """인식된 개체의 제목"""
-    type: Optional[str] = field(repr=True, compare=True, default=None)
-    """인식된 개체 태그"""
-    url: Optional[str] = field(repr=True, compare=True, default=None)
-    """위키피디아 연결 URL"""
+    """개체명 문자열"""
+    link: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 위키피디아 링크"""
 
 
 @dataclass(frozen=True)
 class NELinkingResult(BaseLanguageEtri):
-    """개체 연결 분석 결과"""
-
     mentions: Optional[List[Dict[str, Any]]] = field(
         repr=True, compare=True, default=None
     )
-    """개체 연결 정보 배열"""
+    """개체명 연결 정보"""
     sent_id: Optional[int] = field(repr=True, compare=True, default=None)
     """문장 번호"""
     sentence: Optional[str] = field(repr=True, compare=True, default=None)
-    """문장 원문"""
+    """문장"""
     t_sentence: Optional[str] = field(repr=True, compare=True, default=None)
-    """개체연결 ID가 부착된 문장"""
+    """번역 문장"""
 
     @property
     def Mentions(self) -> List[NELinkingMention]:
-        """개체 연결 정보 배열"""
+        """개체명 연결 정보"""
+        if self.mentions is None:
+            return []
         return [NELinkingMention(**mention) for mention in self.mentions]
 
 
-####################### 상호참조 해결 #######################
-@dataclass(frozen=True)
-class CoreferenceMention:
-    id: Optional[int] = field(repr=True, compare=True, default=None)
-    text: Optional[str] = field(repr=True, compare=True, default=None)
-    sent_id: Optional[int] = field(repr=True, compare=True, default=None)
-    """문장 ID"""
-    start_eid: Optional[int] = field(repr=True, compare=True, default=None)
-    """문장 내 text의 시작 어절 ID"""
-    end_eid: Optional[int] = field(repr=True, compare=True, default=None)
-    """문장 내 text의 종료 어절 ID"""
-    start_eid_short: Optional[int] = field(repr=True, compare=True, default=None)
-    """문장 내 text_short의 시작 어절 ID"""
-    end_eid_short: Optional[int] = field(repr=True, compare=True, default=None)
-    """문장 내 text_short의 종료 어절 ID"""
-    text_short: Optional[str] = field(repr=True, compare=True, default=None)
-    """짧게 표현된 멘션 텍스트"""
-
-
+####################### 코어퍼런스 #######################
 @dataclass(frozen=True)
 class CoreferenceEntity:
-    """어휘관계 분석 결과"""
-
-    animacy: Optional[str] = field(repr=True, compare=True, default=None)
-    mention: Optional[List[Dict[str, Any]]] = field(
-        repr=True, compare=True, default=None
-    )
-    """인식된 멘션 목록"""
-    gender: Optional[str] = field(repr=True, compare=True, default=None)
-    number: Optional[str] = field(repr=True, compare=True, default=None)
-    person: Optional[str] = field(repr=True, compare=True, default=None)
+    text: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 문자열"""
     type: Optional[str] = field(repr=True, compare=True, default=None)
-    id: Optional[int] = field(repr=True, compare=True, default=None)
-
-    @property
-    def Mention(self) -> List[CoreferenceMention]:
-        """인식된 멘션 목록"""
-        return [CoreferenceMention(**mention) for mention in self.mention]
+    """개체명 유형"""
+    entity: Optional[List[str]] = field(repr=True, compare=True, default=None)
+    """개체명 연결 문자열"""
+    animacy: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 유무생물 정보"""
+    gender: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 성별"""
+    number: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 수"""
 
 
 @dataclass(frozen=True)
@@ -334,14 +312,17 @@ class CoreferenceResult(BaseLanguageEtri):
     entity: Optional[List[Dict[str, Any]]] = field(
         repr=True, compare=True, default=None
     )
-    """어휘관계 분석 결과"""
+    """코어퍼런스 분석 결과"""
 
     @property
     def Entity(self) -> List[CoreferenceEntity]:
-        """어휘관계 분석 결과"""
+        """코어퍼런스 분석 결과"""
+        if self.entity is None:
+            return []
         entity_ = []
         for entity in self.entity:
-            entity["animacy"] = entity["animacy "]
-            del entity["animacy "]
+            if "animacy " in entity:
+                entity["animacy"] = entity["animacy "]
+                del entity["animacy "]
             entity_.append(entity)
         return [CoreferenceEntity(**entity) for entity in entity_]

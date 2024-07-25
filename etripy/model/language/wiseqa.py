@@ -2,12 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from .analysis import AnalysisResult
-
-
-@dataclass(frozen=True)
-class BaseQAEtri:
-    data: Dict[str, Any] = field(repr=False)
-    """데이터 Dict"""
+from .base import BaseQAEtri
 
 
 @dataclass(frozen=True)
@@ -96,9 +91,11 @@ class VTitleTopic:
     """개체의 위키백과 정보"""
 
     @property
-    def VEntityInfo(self):
+    def VEntityInfo(self) -> List[VEntityInfo]:
         """개체의 위키백과 정보"""
-        return VEntityInfo(**self.vEntityInfo)
+        if self.vEntityInfo is None:
+            return []
+        return [VEntityInfo(**info) for info in self.vEntityInfo]
 
 
 @dataclass(frozen=True)
@@ -138,41 +135,57 @@ class OrgQUnit:
     @property
     def Ndoc(self) -> AnalysisResult:
         """질문의 언어분석 결과 객체"""
+        if self.ndoc is None:
+            return AnalysisResult(data={})
         return AnalysisResult(data=self.ndoc, **self.ndoc)
 
     @property
     def VQTs(self) -> List[VQT]:
         """의문사기반 질문유형"""
+        if self.vQTs is None:
+            return []
         return [VQT(**vqt) for vqt in self.vQTs]
 
     @property
     def VQFs(self) -> List[VQF]:
         """질문초점 객체 배열"""
+        if self.vQFs is None:
+            return []
         return [VQF(**vqf) for vqf in self.vQFs]
 
     @property
     def VLATs(self) -> List[VLAT]:
         """어휘정답유형 객체 배열"""
+        if self.vLATs is None:
+            return []
         return [VLAT(**vlat) for vlat in self.vLATs]
 
     @property
     def VSATs(self) -> List[VSAT]:
         """어휘정답유형 객체 배열"""
+        if self.vSATs is None:
+            return []
         return [VSAT(**vsat) for vsat in self.vSATs]
 
     @property
     def VSATRoots(self) -> List[VSATRoot]:
         """대분류 의미정답유형 객체 배열"""
+        if self.vSATRoots is None:
+            return []
         return [VSATRoot(**vsatr) for vsatr in self.vSATRoots]
 
     @property
     def VTitles(self) -> List[VTitleTopic]:
         """주요한 개체 정보 배열"""
+        if self.vTitles is None:
+            return []
         return [VTitleTopic(**vtitle) for vtitle in self.vTitles]
 
     @property
     def VQTopic(self) -> List[VTitleTopic]:
         """위키백과 타이틀 중 가장 중요한 타이틀"""
+        if self.vQTopic is None:
+            return []
         return [VTitleTopic(**vqtopic) for vqtopic in self.vQTopic]
 
 
@@ -180,12 +193,14 @@ class OrgQUnit:
 class OrgQInfo:
     """질문분석 기본정보"""
 
-    orgQUnit: Dict[str, Any] = field(repr=True, compare=True, default=None)
+    orgQUnit: Optional[Dict[str, Any]] = field(repr=True, compare=True, default_factory=dict)  # default_factory를 사용하여 기본값 설정
     """원질문 정보 객체"""
 
     @property
     def OrgQUnit(self) -> OrgQUnit:
         """원질문 정보 객체"""
+        if not self.orgQUnit:
+            return OrgQUnit()
         return OrgQUnit(**self.orgQUnit)
 
 
@@ -195,7 +210,7 @@ class AnsQType:
 
     strQType4Chg: Optional[str] = field(repr=True, compare=True, default=None)
     """질문유형 스트링"""
-    dWeightCQT: Optional[str] = field(repr=True, compare=True, default=None)
+    dWeightCQT: Optional[float] = field(repr=True, compare=True, default=None)  # 기본값을 None에서 float로 변경
     """인식 신뢰도"""
 
 
@@ -205,7 +220,7 @@ class VSemQType:
 
     strQType4Chg: Optional[str] = field(repr=True, compare=True, default=None)
     """질문유형 스트링"""
-    dWeightCQT: Optional[str] = field(repr=True, compare=True, default=None)
+    dWeightCQT: Optional[float] = field(repr=True, compare=True, default=None)  # 기본값을 None에서 float로 변경
     """인식 신뢰도"""
 
 
@@ -213,19 +228,23 @@ class VSemQType:
 class QClassification:
     """질문분류 정보 객체"""
 
-    ansQType: Optional[Dict[str, Any]] = field(repr=True, compare=True, default=None)
+    ansQType: Optional[Dict[str, Any]] = field(repr=True, compare=True, default_factory=dict)  # default_factory를 사용하여 기본값 설정
     """정답형태에 따른 질문유형 객체"""
-    vSemQType: Optional[Dict[str, Any]] = field(repr=True, compare=True, default=None)
+    vSemQType: Optional[Dict[str, Any]] = field(repr=True, compare=True, default_factory=dict)  # default_factory를 사용하여 기본값 설정
     """의미적 질문유형 객체"""
 
     @property
     def AnsQType(self) -> AnsQType:
         """정답형태에 따른 질문유형 객체"""
+        if not self.ansQType:
+            return AnsQType()
         return AnsQType(**self.ansQType)
 
     @property
     def VSemQType(self) -> VSemQType:
         """의미적 질문유형 객체"""
+        if not self.vSemQType:
+            return VSemQType()
         return VSemQType(**self.vSemQType)
 
 
@@ -236,9 +255,9 @@ class WiseQAnalResult(BaseQAEtri):
     @property
     def OrgQInfo(self) -> OrgQInfo:
         """질문분석 기본정보"""
-        return OrgQInfo(**self.data["return_object"]["orgQInfo"])
+        return OrgQInfo(**self.data.get("return_object", {}).get("orgQInfo", {}))
 
     @property
     def QClassification(self) -> QClassification:
         """질문분류 정보 객체"""
-        return QClassification(**self.data["return_object"]["QClassification"])
+        return QClassification(**self.data.get("return_object", {}).get("QClassification", {}))
