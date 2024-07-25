@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, Union
+from typing import Dict, Union, Any
 
 import aiohttp
 
@@ -15,8 +15,8 @@ class EtriRequest:
         self.access_key = access_key
 
     async def request(
-        self, method: str, endpoint: str, data: Dict[str, Union[str, int]]
-    ) -> Dict[str, Union[str, int]]:
+        self, method: str, endpoint: str, data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
             "Authorization": self.access_key,
@@ -29,12 +29,12 @@ class EtriRequest:
                 if rescode == 200:
                     return await response.json()
                 else:
-                    data = await response.text()
-                    raise HTTPException(f"Error Code {rescode} : {data}")
+                    text_data = await response.text()
+                    raise HTTPException(f"Error Code {rescode} : {text_data}")
 
     async def request_file_upload(
         self, data: aiohttp.FormData
-    ) -> Dict[str, Union[str, int]]:
+    ) -> Dict[str, Any]:
         headers = {
             "Authorization": self.access_key,
         }
@@ -46,10 +46,10 @@ class EtriRequest:
                 if rescode == 200:
                     return await response.json()
                 else:
-                    data = await response.text()
-                    raise HTTPException(f"Error Code {rescode} : {data}")
+                    text_data = await response.text()
+                    raise HTTPException(f"Error Code {rescode} : {text_data}")
 
-    async def get_analysis_data(self, data: Dict[str, str], spoken: bool):
+    async def get_analysis_data(self, data: Dict[str, Any], spoken: bool):
         if spoken:
             return await self.request(
                 method="POST", endpoint="/WiseNLU_spoken", data=data
@@ -66,12 +66,12 @@ class EtriRequest:
 
         requestJson = {"argument": {"type": file_type}}
 
-        data = aiohttp.FormData()
-        data.add_field("json", json.dumps(requestJson), content_type="application/json")
-        data.add_field(
+        form_data = aiohttp.FormData()
+        form_data.add_field("json", json.dumps(requestJson), content_type="application/json")
+        form_data.add_field(
             "doc_file",
             file_content,
             filename=os.path.basename(file.name),
             content_type="application/octet-stream",
         )
-        return await self.request_file_upload(data=data)
+        return await self.request_file_upload(data=form_data)
