@@ -43,8 +43,11 @@ class AnalysisClient(SyncEtriRequest):
         `text` : 분석할 자연어 문장으로서 UTF-8 인코딩된 텍스트만 지원
         """
         data: Dict[str, Union[str, int]] = {
-            "analysis_code": str(analysis_code),  # 문자열로 변환
-            "text": text,
+            "argument": {
+                "analysis_code": str(analysis_code),  # 문자열로 변환
+                "text": text,
+            }
+            
         }
         result = self.get_analysis_data(data=data, spoken=spoken)
         try:
@@ -65,9 +68,8 @@ class AnalysisClient(SyncEtriRequest):
         """
         if len(sentences) != 2:
             raise SentencesException(f"두 문장만 입력해주세요.\n현재 입력한 문장 수 : {len(sentences)}")
-        data: Dict[str, Union[str, int]] = {
-            "sentence1": sentences[0],
-            "sentence2": sentences[1],
+        data = {
+            "argument": {"sentence1": sentences[0], "sentence2": sentences[1]},
         }
         result = self.request(method="POST", endpoint="/ParaphraseQA", data=data)
         try:
@@ -87,7 +89,7 @@ class AnalysisClient(SyncEtriRequest):
         `word` : 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
         data: Dict[str, Union[str, int]] = {
-            "word": word,
+            "argument": {"word": word}
         }
         result = self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
         try:
@@ -107,7 +109,7 @@ class AnalysisClient(SyncEtriRequest):
         `word` : 동음이의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
         data: Dict[str, Union[str, int]] = {
-            "word": word,
+            "argument": {"word": word}
         }
         result = self.request(method="POST", endpoint="/WiseWWN/Homonym", data=data)
         try:
@@ -130,7 +132,7 @@ class AnalysisClient(SyncEtriRequest):
         `homonym_code` : 다의어를 조회할 어휘의 동음이의어 코드 (필수 X)
         """
         data: Dict[str, Union[str, int]] = {
-            "word": word,
+            "argument": {"word": word }
         }
         if homonym_code:
             data["homonym_code"] = homonym_code
@@ -161,8 +163,10 @@ class AnalysisClient(SyncEtriRequest):
         `second_sense_id` : 두 번째 어휘의 의미 코드 (필수 X)\n
         """
         data: Dict[str, Union[str, int]] = {
-            "first_word": first_word,
-            "second_word": second_word,
+            "argument": {
+                "first_word": first_word,
+                "second_word": second_word
+            }
         }
         if first_sense_id:
             data["first_sense_id"] = first_sense_id
@@ -185,10 +189,12 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `contents` : 분석할 문단
         """
-        data: Dict[str, Union[str, int]] = {
-            "contents": contents,
+        data = {
+            "argument": { "contents": contents }
+            
         }
         result = self.request(method="POST", endpoint="/NELinking", data=data)
+        print(result)
         try:
             if result["return_object"] == {}:
                 return None
@@ -209,7 +215,7 @@ class AnalysisClient(SyncEtriRequest):
         `text` : 분석할 문단
         """
         data: Dict[str, Union[str, int]] = {
-            "text": text,
+            "argument": {"text": text}
         }
         result = self.request(method="POST", endpoint="/Coreference", data=data)
         try:
