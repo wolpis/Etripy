@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, Union, Any
+from typing import Any, Dict, Union
 
 import aiohttp
 
@@ -32,9 +32,7 @@ class EtriRequest:
                     text_data = await response.text()
                     raise HTTPException(f"Error Code {rescode} : {text_data}")
 
-    async def request_file_upload(
-        self, data: aiohttp.FormData
-    ) -> Dict[str, Any]:
+    async def request_file_upload(self, data: aiohttp.FormData) -> Dict[str, Any]:
         headers = {
             "Authorization": self.access_key,
         }
@@ -67,7 +65,9 @@ class EtriRequest:
         requestJson = {"argument": {"type": file_type}}
 
         form_data = aiohttp.FormData()
-        form_data.add_field("json", json.dumps(requestJson), content_type="application/json")
+        form_data.add_field(
+            "json", json.dumps(requestJson), content_type="application/json"
+        )
         form_data.add_field(
             "doc_file",
             file_content,

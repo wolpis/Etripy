@@ -1,14 +1,24 @@
-from typing import List, Optional, Tuple, Union, Dict, Collection
+from typing import Collection, Dict, List, Optional, Tuple, Union
 
 from etripy.error import AnalysisException, QAException, SentencesException
 from etripy.http import EtriRequest
 from etripy.model import AnalysisCode, FileType, WikiType
-from etripy.model.language import (AnalysisResult, CoreferenceResult,
-                                   DocResult, DocUploadResult, HomonymResult,
-                                   LegalResult, MRCResult, NELinkingResult,
-                                   ParaphraseResult, PolysemyResult,
-                                   WiKiResult, WiseQAnalResult, WordRelResult,
-                                   WordResult)
+from etripy.model.language import (
+    AnalysisResult,
+    CoreferenceResult,
+    DocResult,
+    DocUploadResult,
+    HomonymResult,
+    LegalResult,
+    MRCResult,
+    NELinkingResult,
+    ParaphraseResult,
+    PolysemyResult,
+    WiKiResult,
+    WiseQAnalResult,
+    WordRelResult,
+    WordResult,
+)
 
 
 class AnalysisClient(EtriRequest):
@@ -108,7 +118,9 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return HomonymResult(data=result, **result["return_object"])
 
-    async def polysemy(self, word: str, homonym_code: Optional[str] = None) -> Optional[PolysemyResult]:
+    async def polysemy(
+        self, word: str, homonym_code: Optional[str] = None
+    ) -> Optional[PolysemyResult]:
         """
         ### - 다의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 다의어(두 가지 이상의 뜻을 가진 단어) 사전 정보를 조회하는 API로 입력된 어휘의 다의어 정보를 제공합니다.

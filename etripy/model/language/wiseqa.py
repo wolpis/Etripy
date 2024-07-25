@@ -193,7 +193,9 @@ class OrgQUnit:
 class OrgQInfo:
     """질문분석 기본정보"""
 
-    orgQUnit: Optional[Dict[str, Any]] = field(repr=True, compare=True, default_factory=dict)  # default_factory를 사용하여 기본값 설정
+    orgQUnit: Optional[Dict[str, Any]] = field(
+        repr=True, compare=True, default_factory=dict
+    )  # default_factory를 사용하여 기본값 설정
     """원질문 정보 객체"""
 
     @property
@@ -210,7 +212,9 @@ class AnsQType:
 
     strQType4Chg: Optional[str] = field(repr=True, compare=True, default=None)
     """질문유형 스트링"""
-    dWeightCQT: Optional[float] = field(repr=True, compare=True, default=None)  # 기본값을 None에서 float로 변경
+    dWeightCQT: Optional[float] = field(
+        repr=True, compare=True, default=None
+    )  # 기본값을 None에서 float로 변경
     """인식 신뢰도"""
 
 
@@ -220,7 +224,9 @@ class VSemQType:
 
     strQType4Chg: Optional[str] = field(repr=True, compare=True, default=None)
     """질문유형 스트링"""
-    dWeightCQT: Optional[float] = field(repr=True, compare=True, default=None)  # 기본값을 None에서 float로 변경
+    dWeightCQT: Optional[float] = field(
+        repr=True, compare=True, default=None
+    )  # 기본값을 None에서 float로 변경
     """인식 신뢰도"""
 
 
@@ -228,9 +234,13 @@ class VSemQType:
 class QClassification:
     """질문분류 정보 객체"""
 
-    ansQType: Optional[Dict[str, Any]] = field(repr=True, compare=True, default_factory=dict)  # default_factory를 사용하여 기본값 설정
+    ansQType: Optional[Dict[str, Any]] = field(
+        repr=True, compare=True, default_factory=dict
+    )  # default_factory를 사용하여 기본값 설정
     """정답형태에 따른 질문유형 객체"""
-    vSemQType: Optional[Dict[str, Any]] = field(repr=True, compare=True, default_factory=dict)  # default_factory를 사용하여 기본값 설정
+    vSemQType: Optional[Dict[str, Any]] = field(
+        repr=True, compare=True, default_factory=dict
+    )  # default_factory를 사용하여 기본값 설정
     """의미적 질문유형 객체"""
 
     @property
@@ -260,4 +270,6 @@ class WiseQAnalResult(BaseQAEtri):
     @property
     def QClassification(self) -> QClassification:
         """질문분류 정보 객체"""
-        return QClassification(**self.data.get("return_object", {}).get("QClassification", {}))
+        return QClassification(
+            **self.data.get("return_object", {}).get("QClassification", {})
+        )

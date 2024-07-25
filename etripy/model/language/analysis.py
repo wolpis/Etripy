@@ -107,7 +107,9 @@ class Srl:
     sense: Optional[int] = field(repr=True, compare=True, default=None)
     word_id: Optional[int] = field(repr=True, compare=True, default=None)
     weight: Optional[float] = field(repr=True, compare=True, default=None)
-    argument: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
+    argument: Optional[List[Dict[str, Any]]] = field(
+        repr=True, compare=True, default=None
+    )
 
     @property
     def Argument(self) -> List[SrlArgument]:
@@ -129,14 +131,20 @@ class Sentence:
     reserve_str: Optional[str] = field(repr=True, compare=True, default=None)
     text: Optional[str] = field(repr=True, compare=True, default=None)
     morp: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
-    morp_eval: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
+    morp_eval: Optional[List[Dict[str, Any]]] = field(
+        repr=True, compare=True, default=None
+    )
     WSD: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
     word: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
     NE: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
     NE_Link: Optional[List[Any]] = field(repr=True, compare=True, default=None)
     chunk: Optional[List[Any]] = field(repr=True, compare=True, default=None)
-    dependency: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
-    phrase_dependency: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
+    dependency: Optional[List[Dict[str, Any]]] = field(
+        repr=True, compare=True, default=None
+    )
+    phrase_dependency: Optional[List[Dict[str, Any]]] = field(
+        repr=True, compare=True, default=None
+    )
     SRL: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
     relation: Optional[List[Any]] = field(repr=True, compare=True, default=None)
     SA: Optional[List[Any]] = field(repr=True, compare=True, default=None)
@@ -206,7 +214,9 @@ class AnalysisResult(BaseLanguageEtri):
     title: Optional[Dict[str, str]] = field(repr=True, compare=True, default=None)
     metaInfo: Optional[Dict[Any, Any]] = field(repr=True, compare=True, default=None)
     paragraphInfo: Optional[List[str]] = field(repr=True, compare=True, default=None)
-    sentence: Optional[List[Dict[str, Any]]] = field(repr=True, compare=True, default=None)
+    sentence: Optional[List[Dict[str, Any]]] = field(
+        repr=True, compare=True, default=None
+    )
     entity: Optional[List[Any]] = field(repr=True, compare=True, default=None)
 
     @property

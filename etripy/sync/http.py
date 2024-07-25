@@ -16,7 +16,7 @@ class SyncEtriRequest:
 
     def request(
         self, method: str, endpoint: str, data: Dict[str, Union[str, int]]
-    ) -> Dict[str, Union[str, int]]:
+    ) -> Dict[str, Any]:
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
             "Authorization": self.access_key,
@@ -29,7 +29,7 @@ class SyncEtriRequest:
         else:
             raise HTTPException(f"Error Code : {rescode} : {response.text}")
 
-    def request_file_upload(self, data: Dict[str, Any]) -> Dict[str, Union[str, int]]:
+    def request_file_upload(self, data: Dict[str, Any]) -> Dict[str, Any]:
         headers = {"Authorization": self.access_key}
         url = self.base_url + "/DocUpload"
         response = requests.request(
@@ -45,7 +45,7 @@ class SyncEtriRequest:
         else:
             raise HTTPException(f"Error Code : {rescode} : {response.text}")
 
-    def get_analysis_data(self, data: Dict[str, str], spoken: bool):
+    def get_analysis_data(self, data: Dict[str, Union[str, int]], spoken: bool):
         if spoken:
             return self.request(method="POST", endpoint="/WiseNLU_spoken", data=data)
         else:
@@ -54,14 +54,13 @@ class SyncEtriRequest:
     def file_upload(
         self, upload_file_path: str, file_type: Union[FileType, str] = "hwp"
     ):
-        file = open(upload_file_path, "rb")
-        file_content = file.read()
-        file.close()
+        with open(upload_file_path, "rb") as file:
+            file_content = file.read()
 
         requestJson = {"argument": {"type": file_type}}
 
         data = {
             "json": json.dumps(requestJson),
-            "doc_file": (os.path.basename(file.name), file_content),
+            "doc_file": (os.path.basename(upload_file_path), file_content),
         }
         return self.request_file_upload(data=data)
