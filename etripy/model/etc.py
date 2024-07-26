@@ -7,7 +7,7 @@ class AnalysisCode:
     wsd: str = "wsd"
     """어휘의미 분석 (동음이의어 분석)(문어)"""
 
-    wsd: str = "wsd_poly"
+    wsd_poly: str = "wsd_poly"
     """어휘의미 분석 (다의어 분석)(문어)"""
 
     ner: str = "ner"

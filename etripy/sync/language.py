@@ -1,13 +1,23 @@
-from typing import List, Optional, Tuple, Union
+from typing import Any, Collection, Dict, List, Optional, Tuple, Union
 
 from etripy.error import AnalysisException, QAException, SentencesException
 from etripy.model import AnalysisCode, FileType, WikiType
-from etripy.model.language import (AnalysisResult, CoreferenceResult,
-                                   DocResult, DocUploadResult, HomonymResult,
-                                   LegalResult, MRCResult, NELinkingResult,
-                                   ParaphraseResult, PolysemyResult,
-                                   WiKiResult, WiseQAnalResult, WordRelResult,
-                                   WordResult)
+from etripy.model.language import (
+    AnalysisResult,
+    CoreferenceResult,
+    DocResult,
+    DocUploadResult,
+    HomonymResult,
+    LegalResult,
+    MRCResult,
+    NELinkingResult,
+    ParaphraseResult,
+    PolysemyResult,
+    WiKiResult,
+    WiseQAnalResult,
+    WordRelResult,
+    WordResult,
+)
 from etripy.sync.http import SyncEtriRequest
 
 
@@ -32,8 +42,12 @@ class AnalysisClient(SyncEtriRequest):
         `analysis_code` : 요청할 분석 코드 (AnalysisCode 클래스 사용 권장)\n
         `text` : 분석할 자연어 문장으로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data = {
-            "argument": {"analysis_code": analysis_code, "text": text},
+        data: Dict[str, Union[str, int]] = {
+            "argument": {
+                "analysis_code": str(analysis_code),  # 문자열로 변환
+                "text": text,
+            }
+            
         }
         result = self.get_analysis_data(data=data, spoken=spoken)
         try:
@@ -44,7 +58,7 @@ class AnalysisClient(SyncEtriRequest):
                 raise AnalysisException(result["reason"])
         return AnalysisResult(data=result, **result["return_object"])
 
-    def paraphrase(self, *sentences: Tuple[str]) -> Optional[ParaphraseResult]:
+    def paraphrase(self, *sentences: str) -> Optional[ParaphraseResult]:
         """
         ### - 문장 패러프레이즈 인식
         문장 패러프레이즈 인식 API는 두 개의 문장이 동등한 의미를 가지는지 여부를 판별합니다.
@@ -74,8 +88,8 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `word` : 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data = {
-            "argument": {"word": word},
+        data: Dict[str, Union[str, int]] = {
+            "argument": {"word": word}
         }
         result = self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
         try:
@@ -86,7 +100,7 @@ class AnalysisClient(SyncEtriRequest):
                 raise AnalysisException(result["reason"])
         return WordResult(data=result)
 
-    def homonym(self, word: str):
+    def homonym(self, word: str) -> Optional[HomonymResult]:
         """
         ### - 동음이의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 동음이의어(소리는 같으나 뜻이 다른 단어) 사전 정보를 조회하는 API로 입력된 어휘의 동음이의어 정보를 제공합니다.
@@ -94,8 +108,8 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `word` : 동음이의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data = {
-            "argument": {"word": word},
+        data: Dict[str, Union[str, int]] = {
+            "argument": {"word": word}
         }
         result = self.request(method="POST", endpoint="/WiseWWN/Homonym", data=data)
         try:
@@ -106,7 +120,9 @@ class AnalysisClient(SyncEtriRequest):
                 raise AnalysisException(result["reason"])
         return HomonymResult(data=result, **result["return_object"])
 
-    def polysemy(self, word: str, homonym_code: str = None):
+    def polysemy(
+        self, word: str, homonym_code: Optional[str] = None
+    ) -> Optional[PolysemyResult]:
         """
         ### - 다의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 다의어(두 가지 이상의 뜻을 가진 단어) 사전 정보를 조회하는 API로 입력된 어휘의 다의어 정보를 제공합니다.
@@ -115,16 +131,11 @@ class AnalysisClient(SyncEtriRequest):
         `word` : 다의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `homonym_code` : 다의어를 조회할 어휘의 동음이의어 코드 (필수 X)
         """
+        data: Dict[str, Union[str, int]] = {
+            "argument": {"word": word }
+        }
         if homonym_code:
-            data = {
-                "request_id": "reserved field",
-                "argument": {"word": word, "homonym_code": homonym_code},
-            }
-        else:
-            data = {
-                "request_id": "reserved field",
-                "argument": {"word": word},
-            }
+            data["homonym_code"] = homonym_code
         result = self.request(method="POST", endpoint="/WiseWWN/Polysemy", data=data)
         try:
             if result["return_object"] == {}:
@@ -138,9 +149,9 @@ class AnalysisClient(SyncEtriRequest):
         self,
         first_word: str,
         second_word: str,
-        first_sense_id: str = None,
-        second_sense_id: str = None,
-    ):
+        first_sense_id: Optional[str] = None,
+        second_sense_id: Optional[str] = None,
+    ) -> Optional[WordRelResult]:
         """
         ### - 어휘 간 유사도 분석
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘 간 거리 정보를 분석하는 기술로서 입력된 여휘간 유사도 결과를 제공합니다.
@@ -151,13 +162,16 @@ class AnalysisClient(SyncEtriRequest):
         `second_word` : 비교 분석 대상 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `second_sense_id` : 두 번째 어휘의 의미 코드 (필수 X)\n
         """
-        data = {
-            "argument": {"first_word": first_word, "second_word": second_word},
+        data: Dict[str, Union[str, int]] = {
+            "argument": {
+                "first_word": first_word,
+                "second_word": second_word
+            }
         }
         if first_sense_id:
-            data["argument"]["first_sense_id"] = first_sense_id
+            data["first_sense_id"] = first_sense_id
         if second_sense_id:
-            data["argument"]["second_sense_id"] = second_sense_id
+            data["second_sense_id"] = second_sense_id
         result = self.request(method="POST", endpoint="/WiseWWN/WordRel", data=data)
         try:
             if result["return_object"] == {}:
@@ -176,9 +190,11 @@ class AnalysisClient(SyncEtriRequest):
         `contents` : 분석할 문단
         """
         data = {
-            "argument": {"contents": contents},
+            "argument": { "contents": contents }
+            
         }
         result = self.request(method="POST", endpoint="/NELinking", data=data)
+        print(result)
         try:
             if result["return_object"] == {}:
                 return None
@@ -198,8 +214,8 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `text` : 분석할 문단
         """
-        data = {
-            "argument": {"text": text},
+        data: Dict[str, Union[str, int]] = {
+            "argument": {"text": text}
         }
         result = self.request(method="POST", endpoint="/Coreference", data=data)
         try:
@@ -208,8 +224,7 @@ class AnalysisClient(SyncEtriRequest):
         except KeyError:
             if result["result"] != "0":
                 raise AnalysisException(result["reason"])
-        result_ = {}
-        result_["entity"] = result["return_object"]["entity"]
+        result_ = {"entity": result["return_object"]["entity"]}
         return CoreferenceResult(data=result, **result_)
 
 
@@ -231,8 +246,8 @@ class QAClient(SyncEtriRequest):
         #### Parameter
         `text` : 분석할 질문 Text 로서 UTF-8 인코딩된 텍스트만 지원합니다.
         """
-        data = {
-            "argument": {"text": text},
+        data: Dict[str, Union[str, int]] = {
+            "text": text,
         }
         result = self.request(method="POST", endpoint="/WiseQAnal", data=data)
         try:
@@ -252,8 +267,9 @@ class QAClient(SyncEtriRequest):
         `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `passage` : 질문의 답이 포함된 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data = {
-            "argument": {"passage": passage, "question": question},
+        data: Dict[str, Union[str, int]] = {
+            "passage": passage,
+            "question": question,
         }
         result = self.request(method="POST", endpoint="/MRCServlet", data=data)
         try:
@@ -273,8 +289,9 @@ class QAClient(SyncEtriRequest):
         `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `type` : 질문 응답 엔진의 종류 로서 UTF-8 인코딩된 텍스트만 지원 (WikiType 클래스 사용 추천)
         """
-        data = {
-            "argument": {"type": type, "question": question},
+        data: Dict[str, Union[str, int]] = {
+            "type": str(type),  # 문자열로 변환
+            "question": question,
         }
         result = self.request(method="POST", endpoint="/WikiQA", data=data)
         try:
@@ -293,8 +310,8 @@ class QAClient(SyncEtriRequest):
         #### Parameter
         `question` : 질문하고자 하는 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         """
-        data = {
-            "argument": {"question": question},
+        data: Dict[str, Union[str, int]] = {
+            "question": question,
         }
         result = self.request(method="POST", endpoint="/LegalQA", data=data)
         try:
@@ -342,8 +359,9 @@ class QAClient(SyncEtriRequest):
         `doc_key` : 문서 등록 API에서 리턴 받은 doc key 로서 UTF-8 인코딩된 텍스트만 지원\n
         `question` : 질문하고자 하는 text로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data = {
-            "argument": {"doc_key": doc_key, "question": question},
+        data: Dict[str, Union[str, int]] = {
+            "doc_key": doc_key,
+            "question": question,
         }
         result = self.request(method="POST", endpoint="/DocQA", data=data)
         try:

@@ -1,14 +1,24 @@
-from typing import List, Optional, Tuple, Union
+from typing import Collection, Dict, List, Optional, Tuple, Union
 
 from etripy.error import AnalysisException, QAException, SentencesException
 from etripy.http import EtriRequest
 from etripy.model import AnalysisCode, FileType, WikiType
-from etripy.model.language import (AnalysisResult, CoreferenceResult,
-                                   DocResult, DocUploadResult, HomonymResult,
-                                   LegalResult, MRCResult, NELinkingResult,
-                                   ParaphraseResult, PolysemyResult,
-                                   WiKiResult, WiseQAnalResult, WordRelResult,
-                                   WordResult)
+from etripy.model.language import (
+    AnalysisResult,
+    CoreferenceResult,
+    DocResult,
+    DocUploadResult,
+    HomonymResult,
+    LegalResult,
+    MRCResult,
+    NELinkingResult,
+    ParaphraseResult,
+    PolysemyResult,
+    WiKiResult,
+    WiseQAnalResult,
+    WordRelResult,
+    WordResult,
+)
 
 
 class AnalysisClient(EtriRequest):
@@ -86,7 +96,7 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return WordResult(data=result)
 
-    async def homonym(self, word: str):
+    async def homonym(self, word: str) -> Optional[HomonymResult]:
         """
         ### - 동음이의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 동음이의어(소리는 같으나 뜻이 다른 단어) 사전 정보를 조회하는 API로 입력된 어휘의 동음이의어 정보를 제공합니다.
@@ -108,7 +118,9 @@ class AnalysisClient(EtriRequest):
                 raise AnalysisException(result["reason"])
         return HomonymResult(data=result, **result["return_object"])
 
-    async def polysemy(self, word: str, homonym_code: str = None):
+    async def polysemy(
+        self, word: str, homonym_code: Optional[str] = None
+    ) -> Optional[PolysemyResult]:
         """
         ### - 다의어 정보
         국립국어원의 표준국어대사전에 등재된 어휘의 다의어(두 가지 이상의 뜻을 가진 단어) 사전 정보를 조회하는 API로 입력된 어휘의 다의어 정보를 제공합니다.
@@ -142,9 +154,9 @@ class AnalysisClient(EtriRequest):
         self,
         first_word: str,
         second_word: str,
-        first_sense_id: str = None,
-        second_sense_id: str = None,
-    ):
+        first_sense_id: Optional[str] = None,
+        second_sense_id: Optional[str] = None,
+    ) -> Optional[WordRelResult]:
         """
         ### - 어휘 간 유사도 분석
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘 간 거리 정보를 분석하는 기술로서 입력된 여휘간 유사도 결과를 제공합니다.
