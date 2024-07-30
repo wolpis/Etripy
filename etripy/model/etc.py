@@ -41,3 +41,52 @@ class FileType:
 
     hwpx: str = "hwpx"
     """hwpx 문서를 분석할 때 사용합니다."""
+
+
+class LanguageCodeType:
+    """음성인식의 입력 음성 언어 코드입니다."""
+
+    korean: str = "korean"
+    """한국어 음성인식 코드"""
+
+    english: str = "english"
+    """영어 음성인식 코드"""
+
+    japanese: str = "japanese"
+    """일본어 음성인식 코드"""
+
+    chinese: str = "chinese"
+    """중국어 음성인식 코드"""
+
+    spanish: str = "spanish"
+    """스페인어 음성인식 코드"""
+
+    french: str = "french"
+    """프랑스어 음성인식 코드"""
+
+    german: str = "german"
+    """독일어 음성인식 코드"""
+
+    russian: str = "russian"
+    """러시아어 음성인식 코드"""
+
+    vietnam: str = "vietnam"
+    """베트남어 음성인식 코드"""
+    
+    arabic: str = "arabic"
+    """아랍어 음성인식 코드"""
+
+    thailand: str = "thailand"
+    """태국어 음성인식 코드"""
+
+    portuguese: str = "portuguese"
+    """포르투칼어 음성인식 코드"""
+
+    malaysia: str = "malaysia"
+    """말레이어 음성인식 코드"""
+
+    indonesian: str = "indonesian"
+    """인도네시아어 음성인식 코드"""
+
+    cantonese: str = "cantonese"
+    """광둥어 음성인식 코드"""
