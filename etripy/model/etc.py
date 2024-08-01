@@ -72,7 +72,7 @@ class LanguageCodeType:
 
     vietnam: str = "vietnam"
     """베트남어 음성인식 코드"""
-    
+
     arabic: str = "arabic"
     """아랍어 음성인식 코드"""
 

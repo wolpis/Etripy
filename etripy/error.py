@@ -13,5 +13,10 @@ class QAException(Exception):
 class AnalysisException(Exception):
     pass
 
+
 class AudioFileException(Exception):
+    pass
+
+
+class VoiceRecognitionException(Exception):
     pass

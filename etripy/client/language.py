@@ -325,51 +325,52 @@ class QAClient(EtriRequest):
                 raise QAException(result["reason"])
         return LegalResult(data=result)
 
-    async def doc_upload(
-        self,
-        upload_file_path: str,
-        file_type: Union[FileType, str] = "hwp",
-        message: bool = False,
-    ) -> Optional[DocUploadResult]:
-        """
-        ### - 행정문서 QA (문서등록)
-        행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
+    # API 측에서 서비스 종료로 인한 코드 주석 처리
+    # async def doc_upload(
+    #     self,
+    #     upload_file_path: str,
+    #     file_type: Union[FileType, str] = "hwp",
+    #     message: bool = False,
+    # ) -> Optional[DocUploadResult]:
+    #     """
+    #     ### - 행정문서 QA (문서등록)
+    #     행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
 
-        #### Parameter
-        `upload_file_path` : 업로드 할려는 문서 파일의 경로\n
-        `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)\n
-        `message` : 파일 업로드 메세지를 출력합니다.
-        """
-        if message:
-            print("파일 업로드 중...")
-        result = await self.file_upload(
-            upload_file_path=upload_file_path, file_type=file_type
-        )
-        try:
-            if result["return_object"] == {}:
-                return None
-        except KeyError:
-            if result["result"] != "0":
-                raise QAException(result["reason"])
-        return DocUploadResult(data=result)
+    #     #### Parameter
+    #     `upload_file_path` : 업로드 할려는 문서 파일의 경로\n
+    #     `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)\n
+    #     `message` : 파일 업로드 메세지를 출력합니다.
+    #     """
+    #     if message:
+    #         print("파일 업로드 중...")
+    #     result = await self.file_upload(
+    #         upload_file_path=upload_file_path, file_type=file_type
+    #     )
+    #     try:
+    #         if result["return_object"] == {}:
+    #             return None
+    #     except KeyError:
+    #         if result["result"] != "0":
+    #             raise QAException(result["reason"])
+    #     return DocUploadResult(data=result)
 
-    async def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
-        """
-        ### - 행정문서 QA (질의응답)
-        행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
+    # async def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
+    #     """
+    #     ### - 행정문서 QA (질의응답)
+    #     행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
 
-        #### Parameter
-        `doc_key` : 문서 등록 API에서 리턴 받은 doc key 로서 UTF-8 인코딩된 텍스트만 지원\n
-        `question` : 질문하고자 하는 text로서 UTF-8 인코딩된 텍스트만 지원
-        """
-        data = {
-            "argument": {"doc_key": doc_key, "question": question},
-        }
-        result = await self.request(method="POST", endpoint="/DocQA", data=data)
-        try:
-            if result["return_object"] == {}:
-                return None
-        except KeyError:
-            if result["result"] != "0":
-                raise QAException(result["reason"])
-        return DocResult(data=result)
+    #     #### Parameter
+    #     `doc_key` : 문서 등록 API에서 리턴 받은 doc key 로서 UTF-8 인코딩된 텍스트만 지원\n
+    #     `question` : 질문하고자 하는 text로서 UTF-8 인코딩된 텍스트만 지원
+    #     """
+    #     data = {
+    #         "argument": {"doc_key": doc_key, "question": question},
+    #     }
+    #     result = await self.request(method="POST", endpoint="/DocQA", data=data)
+    #     try:
+    #         if result["return_object"] == {}:
+    #             return None
+    #     except KeyError:
+    #         if result["result"] != "0":
+    #             raise QAException(result["reason"])
+    #     return DocResult(data=result)
