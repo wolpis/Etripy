@@ -20,3 +20,7 @@ class AudioFileException(Exception):
 
 class VoiceRecognitionException(Exception):
     pass
+
+
+class VoicePronunciationException(Exception):
+    pass
