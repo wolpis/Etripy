@@ -47,7 +47,6 @@ class AnalysisClient(SyncEtriRequest):
                 "analysis_code": str(analysis_code),  # 문자열로 변환
                 "text": text,
             }
-            
         }
         result = self.get_analysis_data(data=data, spoken=spoken)
         try:
@@ -88,9 +87,7 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `word` : 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data: Dict[str, Union[str, int]] = {
-            "argument": {"word": word}
-        }
+        data: Dict[str, Union[str, int]] = {"argument": {"word": word}}
         result = self.request(method="POST", endpoint="/WiseWWN/Word", data=data)
         try:
             if result["return_object"] == {}:
@@ -108,9 +105,7 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `word` : 동음이의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원
         """
-        data: Dict[str, Union[str, int]] = {
-            "argument": {"word": word}
-        }
+        data: Dict[str, Union[str, int]] = {"argument": {"word": word}}
         result = self.request(method="POST", endpoint="/WiseWWN/Homonym", data=data)
         try:
             if result["return_object"] == {}:
@@ -131,9 +126,7 @@ class AnalysisClient(SyncEtriRequest):
         `word` : 다의어를 조회할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `homonym_code` : 다의어를 조회할 어휘의 동음이의어 코드 (필수 X)
         """
-        data: Dict[str, Union[str, int]] = {
-            "argument": {"word": word }
-        }
+        data: Dict[str, Union[str, int]] = {"argument": {"word": word}}
         if homonym_code:
             data["homonym_code"] = homonym_code
         result = self.request(method="POST", endpoint="/WiseWWN/Polysemy", data=data)
@@ -163,10 +156,7 @@ class AnalysisClient(SyncEtriRequest):
         `second_sense_id` : 두 번째 어휘의 의미 코드 (필수 X)\n
         """
         data: Dict[str, Union[str, int]] = {
-            "argument": {
-                "first_word": first_word,
-                "second_word": second_word
-            }
+            "argument": {"first_word": first_word, "second_word": second_word}
         }
         if first_sense_id:
             data["first_sense_id"] = first_sense_id
@@ -189,10 +179,7 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `contents` : 분석할 문단
         """
-        data = {
-            "argument": { "contents": contents }
-            
-        }
+        data = {"argument": {"contents": contents}}
         result = self.request(method="POST", endpoint="/NELinking", data=data)
         print(result)
         try:
@@ -214,9 +201,7 @@ class AnalysisClient(SyncEtriRequest):
         #### Parameter
         `text` : 분석할 문단
         """
-        data: Dict[str, Union[str, int]] = {
-            "argument": {"text": text}
-        }
+        data: Dict[str, Union[str, int]] = {"argument": {"text": text}}
         result = self.request(method="POST", endpoint="/Coreference", data=data)
         try:
             if result["return_object"] == {}:
@@ -322,52 +307,53 @@ class QAClient(SyncEtriRequest):
                 raise QAException(result["reason"])
         return LegalResult(data=result)
 
-    def doc_upload(
-        self,
-        upload_file_path: str,
-        file_type: Union[FileType, str] = "hwp",
-        message: bool = False,
-    ) -> Optional[DocUploadResult]:
-        """
-        ### - 행정문서 QA (문서등록)
-        행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
+    # API 측에서 서비스 종료로 인한 코드 주석 처리
+    # def doc_upload(
+    #     self,
+    #     upload_file_path: str,
+    #     file_type: Union[FileType, str] = "hwp",
+    #     message: bool = False,
+    # ) -> Optional[DocUploadResult]:
+    #     """
+    #     ### - 행정문서 QA (문서등록)
+    #     행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
 
-        #### Parameter
-        `upload_file_path` : 업로드 할려는 문서 파일의 경로\n
-        `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)\n
-        `message` : 파일 업로드 메세지를 출력합니다.
-        """
-        if message:
-            print("파일 업로드 중...")
-        result = self.file_upload(
-            upload_file_path=upload_file_path, file_type=file_type
-        )
-        try:
-            if result["return_object"] == {}:
-                return None
-        except KeyError:
-            if result["result"] != "0":
-                raise QAException(result["reason"])
-        return DocUploadResult(data=result)
+    #     #### Parameter
+    #     `upload_file_path` : 업로드 할려는 문서 파일의 경로\n
+    #     `file_type` : 업로드 할려는 문서 파일의 확장자(hwp/hwpx)\n
+    #     `message` : 파일 업로드 메세지를 출력합니다.
+    #     """
+    #     if message:
+    #         print("파일 업로드 중...")
+    #     result = self.file_upload(
+    #         upload_file_path=upload_file_path, file_type=file_type
+    #     )
+    #     try:
+    #         if result["return_object"] == {}:
+    #             return None
+    #     except KeyError:
+    #         if result["result"] != "0":
+    #             raise QAException(result["reason"])
+    #     return DocUploadResult(data=result)
 
-    def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
-        """
-        ### - 행정문서 QA (질의응답)
-        행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
+    # def doc(self, doc_key: str, question: str) -> Optional[DocResult]:
+    #     """
+    #     ### - 행정문서 QA (질의응답)
+    #     행정문서로 작성된 행정문서의 내용을 이해하여 사용자의 자연어 질문에 올바른 답과 근거를 제공합니다.
 
-        #### Parameter
-        `doc_key` : 문서 등록 API에서 리턴 받은 doc key 로서 UTF-8 인코딩된 텍스트만 지원\n
-        `question` : 질문하고자 하는 text로서 UTF-8 인코딩된 텍스트만 지원
-        """
-        data: Dict[str, Union[str, int]] = {
-            "doc_key": doc_key,
-            "question": question,
-        }
-        result = self.request(method="POST", endpoint="/DocQA", data=data)
-        try:
-            if result["return_object"] == {}:
-                return None
-        except KeyError:
-            if result["result"] != "0":
-                raise QAException(result["reason"])
-        return DocResult(data=result)
+    #     #### Parameter
+    #     `doc_key` : 문서 등록 API에서 리턴 받은 doc key 로서 UTF-8 인코딩된 텍스트만 지원\n
+    #     `question` : 질문하고자 하는 text로서 UTF-8 인코딩된 텍스트만 지원
+    #     """
+    #     data: Dict[str, Union[str, int]] = {
+    #         "doc_key": doc_key,
+    #         "question": question,
+    #     }
+    #     result = self.request(method="POST", endpoint="/DocQA", data=data)
+    #     try:
+    #         if result["return_object"] == {}:
+    #             return None
+    #     except KeyError:
+    #         if result["result"] != "0":
+    #             raise QAException(result["reason"])
+    #     return DocResult(data=result)

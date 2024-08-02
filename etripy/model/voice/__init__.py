@@ -1,5 +1,4 @@
-"""
-MIT License
+"""MIT License
 
 Copyright (c) 2023 Kim Suyun
 
@@ -22,5 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from etripy.client.language import *
-from etripy.client.voice import *
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+@dataclass(frozen=True)
+class RecognitionResult:
+    recognized: Optional[str] = field(repr=True, compare=True, default=None)
+    """음성 언어 코드에 따른 음성인식 결과"""
+
+@dataclass(frozen=True)
+class PronunciationResult:
+    recognized: Optional[str] = field(repr=True, compare=True, default=None)
+    """음성 언어 코드에 따른 발음평가 결과"""
+
+    score: Optional[str] = field(repr=True, compare=True, default=None)
+    """발음 평가 점수로 1~5점까지 제공"""

@@ -23,3 +23,4 @@ SOFTWARE.
 
 from etripy.model.etc import *
 from etripy.model.language import *
+from etripy.model.voice import *

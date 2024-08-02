@@ -3,7 +3,6 @@ import os
 from typing import Any, Dict, Union
 
 import requests
-
 from etripy.error import HTTPException
 from etripy.model import FileType
 
