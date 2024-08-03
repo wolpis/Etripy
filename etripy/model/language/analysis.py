@@ -151,7 +151,6 @@ class Srl:
     )
     """논항 정보"""
 
-
     @property
     def Argument(self) -> List[SrlArgument]:
         """논항 정보"""

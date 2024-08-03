@@ -30,6 +30,7 @@ class RecognitionResult:
     recognized: Optional[str] = field(repr=True, compare=True, default=None)
     """음성 언어 코드에 따른 음성인식 결과"""
 
+
 @dataclass(frozen=True)
 class PronunciationResult:
     recognized: Optional[str] = field(repr=True, compare=True, default=None)
