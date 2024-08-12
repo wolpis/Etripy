@@ -159,6 +159,8 @@ class FaceDeIDResult:
 class HumanStatusResult:
     data: Optional[dict[str, str]] = field(repr=True, compare=True, default=None)
     """이미지 객체 분석 결과"""
+    img_url: Optional[str] = field(repr=True, compare=True, default=None)
+    """분석된 이미지의 경로"""
 
     @property
     def class__(self) -> str:

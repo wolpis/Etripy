@@ -149,7 +149,7 @@ class AnalysisClient(SyncEtriRequest):
         ### - 어휘 간 유사도 분석
         다양한 어휘지식을 통합한 WiseWordNet 어휘 지식베이스에 기반하여 어휘 간 거리 정보를 분석하는 기술로서 입력된 여휘간 유사도 결과를 제공합니다.
 
-        #### Parameter
+        #### Parameter\n
         `first_word` : 비교 분석할 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
         `first_sense_id` : 첫 번째 어휘의 의미 코드 (필수 X)\n
         `second_word` : 비교 분석 대상 어휘 Text 로서 UTF-8 인코딩된 텍스트만 지원\n
