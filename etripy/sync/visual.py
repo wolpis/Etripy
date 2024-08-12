@@ -136,6 +136,6 @@ class ImageClient(SyncEtriRequest):
             if result["result"] != "0":
                 raise VisualImageException(result["reason"])
         return [
-            HumanStatusResult(data=data_, img_url=result["return_object"]["data"][0])
-            for data_ in result["return_object"]["data"][1:]
+            HumanStatusResult(data=data_, img_url=result["return_object"][0]["data"][0])
+            for data_ in result["return_object"][0]["data"][1:]
         ]
