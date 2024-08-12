@@ -28,3 +28,7 @@ class VoicePronunciationException(Exception):
 
 class VisualImageException(Exception):
     pass
+
+
+class VisualVideoException(Exception):
+    pass

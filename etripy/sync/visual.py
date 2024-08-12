@@ -1,13 +1,14 @@
 import base64
 from typing import Optional
 
-from etripy.error import VisualImageException
+from etripy.error import VisualImageException, VisualVideoException
 from etripy.model.visual.image import (
     FaceDeIDResult,
     HumanParsingResult,
     HumanStatusResult,
     ObjectDetectResult,
 )
+from etripy.model.visual.video import VideoParseResult
 from etripy.sync.http import SyncEtriRequest
 
 
@@ -138,4 +139,79 @@ class ImageClient(SyncEtriRequest):
         return [
             HumanStatusResult(data=data_, img_url=result["return_object"][0]["data"][0])
             for data_ in result["return_object"][0]["data"][1:]
+        ]
+
+
+class VideoClient(SyncEtriRequest):
+    """
+    ETRI 시각지능 동영상 클라이언트 클래스입니다. (동기 처리)\n
+    동영상의 최대 용량은 50MB까지 업로드할 수 있습니다.\n
+    동영상의 영상 길이는 최소 5초 이상되어야 합니다.\n
+    동영상의 영상 길이는 최대 5분 미만이어야 합니다.\n
+    #### access_key
+    [ETRI 포털사이트](https://aiopen.etri.re.kr/)에서 발급받은 `access_key`를 입력합니다.
+    """
+
+    def __init__(self, access_key: str) -> None:
+        super().__init__(access_key=access_key)
+
+    def video_upload(self, video_path: str) -> str:
+        """
+        비디오를 서버에 등록하여, 비디오 파일 ID를 반환합니다.
+
+        #### Parameter\n
+        `video_path` : API 사용 요청 시 분석을 위해 전달할 비디오 파일 경로
+        """
+        result = self.file_upload(upload_file_path=video_path)
+        try:
+            if result["return_object"] == {}:
+                return None
+        except KeyError:
+            if result["result"] != "0":
+                raise VisualVideoException(result["reason"])
+
+        return result["return_object"]["file_id"]
+
+    def video_parse(self, file_id: str) -> list[VideoParseResult]:
+        """
+        동영상에서 장면이 변화하는 시점을 탐지하여, 동영상을 썸네일로 요약하거나 편집을 용이하게 하는 포인트를 제공합니다.
+        동영상의 각 프레임의 특성 추출 후 특성이 시간적으로 크게 변화하는 시점을 탐지하여 출력합니다.
+
+        #### Parameter\n
+        `file_id` : 장면분할처리를 위한 file의 ID
+        """
+        data = {"argument": {"file_id": file_id}}
+        result = self.request(method="POST", endpoint="/VideoParse/status", data=data)
+        try:
+            if result["return_object"] == {}:
+                return None
+        except KeyError:
+            if result["result"] != "0":
+                raise VisualVideoException(result["reason"])
+
+        return [
+            VideoParseResult(**data_) for data_ in result["return_object"]["result"]
+        ]
+
+    def video_parse_for_path(self, file_path: str) -> list[VideoParseResult]:
+        """
+        동영상에서 장면이 변화하는 시점을 탐지하여, 동영상을 썸네일로 요약하거나 편집을 용이하게 하는 포인트를 제공합니다.
+        동영상의 각 프레임의 특성 추출 후 특성이 시간적으로 크게 변화하는 시점을 탐지하여 출력합니다.\n
+
+        같은 동영상을 자주 분석하는 경우 가급적 `video_parse`를 사용하십시오.
+
+        #### Parameter\n
+        `file_path` : API 사용 요청 시 분석을 위해 전달할 비디오 파일 경로
+        """
+        data = {"argument": {"file_id": self.video_upload(video_path=file_path)}}
+        result = self.request(method="POST", endpoint="/VideoParse/status", data=data)
+        try:
+            if result["return_object"] == {}:
+                return None
+        except KeyError:
+            if result["result"] != "0":
+                raise VisualVideoException(result["reason"])
+
+        return [
+            VideoParseResult(**data_) for data_ in result["return_object"]["result"]
         ]

@@ -28,21 +28,21 @@ class SyncEtriRequest:
         else:
             raise HTTPException(f"Error Code : {rescode} : {response.text}")
 
-    # def request_file_upload(self, data: Dict[str, Any]) -> Dict[str, Any]:
-    #     headers = {"Authorization": self.access_key}
-    #     url = self.base_url + "/DocUpload"
-    #     response = requests.request(
-    #         "POST",
-    #         url=url,
-    #         headers=headers,
-    #         data={"json": data["json"]},
-    #         files={"doc_file": data["doc_file"]},
-    #     )
-    #     rescode = response.status_code
-    #     if rescode == 200:
-    #         return response.json()
-    #     else:
-    #         raise HTTPException(f"Error Code : {rescode} : {response.text}")
+    def request_file_upload(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        headers = {"Authorization": self.access_key}
+        url = self.base_url + "/VideoParse"
+        response = requests.request(
+            "POST",
+            url=url,
+            headers=headers,
+            data={"json": data["json"]},
+            files={"uploadfile": data["uploadfile"]},
+        )
+        rescode = response.status_code
+        if rescode == 200:
+            return response.json()
+        else:
+            raise HTTPException(f"Error Code : {rescode} : {response.text}")
 
     def get_analysis_data(self, data: Dict[str, Union[str, int]], spoken: bool):
         if spoken:
@@ -50,16 +50,14 @@ class SyncEtriRequest:
         else:
             return self.request(method="POST", endpoint="/WiseNLU", data=data)
 
-    # def file_upload(
-    #     self, upload_file_path: str, file_type: Union[FileType, str] = "hwp"
-    # ):
-    #     with open(upload_file_path, "rb") as file:
-    #         file_content = file.read()
+    def file_upload(self, upload_file_path: str):
+        with open(upload_file_path, "rb") as file:
+            file_content = file.read()
 
-    #     requestJson = {"argument": {"type": file_type}}
+        requestJson = {"argument": {}}
 
-    #     data = {
-    #         "json": json.dumps(requestJson),
-    #         "doc_file": (os.path.basename(upload_file_path), file_content),
-    #     }
-    #     return self.request_file_upload(data=data)
+        data = {
+            "json": json.dumps(requestJson),
+            "uploadfile": (os.path.basename(upload_file_path), file_content),
+        }
+        return self.request_file_upload(data=data)
