@@ -72,7 +72,7 @@ class VoiceClient(EtriRequest):
     ) -> Optional[PronunciationResult]:
         """
         ### - 발음평가 기술
-        한국인을 비롯한 비원어민 영어 발성 및 외국인의 한국어 음성에 대해 문장별 발음 수준을 측정하여 데이터를 제공합니다. 
+        한국인을 비롯한 비원어민 영어 발성 및 외국인의 한국어 음성에 대해 문장별 발음 수준을 측정하여 데이터를 제공합니다.
 
         #### Parameter
         `language_code` : 발음평가의 입력 음성 언어 코드입니다. 요청할 수 있는 언어 코드는 korean, english입니다.\n

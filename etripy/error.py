@@ -24,3 +24,11 @@ class VoiceRecognitionException(Exception):
 
 class VoicePronunciationException(Exception):
     pass
+
+
+class VisualImageException(Exception):
+    pass
+
+
+class VisualVideoException(Exception):
+    pass

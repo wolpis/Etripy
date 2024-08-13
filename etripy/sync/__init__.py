@@ -23,3 +23,5 @@ SOFTWARE.
 """
 
 from etripy.sync.language import *
+from etripy.sync.visual import *
+from etripy.sync.voice import *

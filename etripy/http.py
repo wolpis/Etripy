@@ -36,7 +36,7 @@ class EtriRequest:
             "Authorization": self.access_key,
         }
 
-        url = self.base_url + "/DocUpload"
+        url = self.base_url + "/VideoParse"
         async with aiohttp.ClientSession(headers=headers) as session:
             async with session.request("POST", url=url, data=data) as response:
                 rescode = response.status
@@ -54,21 +54,19 @@ class EtriRequest:
         else:
             return await self.request(method="POST", endpoint="/WiseNLU", data=data)
 
-    async def file_upload(
-        self, upload_file_path: str, file_type: Union[FileType, str] = "hwp"
-    ):
+    async def file_upload(self, upload_file_path: str):
         file = open(upload_file_path, "rb")
         file_content = file.read()
         file.close()
 
-        requestJson = {"argument": {"type": file_type}}
+        requestJson = {"argument": {}}
 
         form_data = aiohttp.FormData()
         form_data.add_field(
             "json", json.dumps(requestJson), content_type="application/json"
         )
         form_data.add_field(
-            "doc_file",
+            "uploadfile",
             file_content,
             filename=os.path.basename(file.name),
             content_type="application/octet-stream",

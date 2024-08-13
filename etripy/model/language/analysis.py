@@ -9,10 +9,15 @@ class Morp:
     """형태소 분석 결과"""
 
     id: Optional[int] = field(repr=True, compare=True, default=None)
+    """형태소 ID (출현 순서)"""
     lemma: Optional[str] = field(repr=True, compare=True, default=None)
+    """형태소"""
     type: Optional[str] = field(repr=True, compare=True, default=None)
+    """형태소 태그"""
     position: Optional[int] = field(repr=True, compare=True, default=None)
+    """문장에서의 byte position"""
     weight: Optional[float] = field(repr=True, compare=True, default=None)
+    """형태소 분석 결과 신뢰도"""
 
 
 @dataclass(frozen=True)
@@ -30,13 +35,21 @@ class Wsd:
     """어휘의미 분석 결과"""
 
     id: Optional[int] = field(repr=True, compare=True, default=None)
+    """WSD 대상 ID (출현 순서)"""
     text: Optional[str] = field(repr=True, compare=True, default=None)
+    """WSD 대상 어휘 텍스트"""
     type: Optional[str] = field(repr=True, compare=True, default=None)
+    """어휘 형태소 태그"""
     scode: Optional[str] = field(repr=True, compare=True, default=None)
+    """어휘의 표준국어대사전 어깨번호 (동형이의어 분석 시 2자리, 다의어 분석 시 6자리)"""
     weight: Optional[int] = field(repr=True, compare=True, default=None)
+    """어휘의 어휘의미 분석 결과 신뢰도"""
     position: Optional[int] = field(repr=True, compare=True, default=None)
+    """문장에서의 byte position"""
     begin: Optional[int] = field(repr=True, compare=True, default=None)
+    """어휘의 첫 형태소의 ID"""
     end: Optional[int] = field(repr=True, compare=True, default=None)
+    """어휘의 끝 형태소의 ID"""
 
 
 @dataclass(frozen=True)
@@ -44,10 +57,15 @@ class Word:
     """어절 정보 분석 결과"""
 
     id: Optional[int] = field(repr=True, compare=True, default=None)
+    """어절의 ID (출현 순서)"""
     text: Optional[str] = field(repr=True, compare=True, default=None)
+    """어절의 대상 텍스트"""
     type: Optional[str] = field(repr=True, compare=True, default=None)
+    """어절 타입"""
     begin: Optional[int] = field(repr=True, compare=True, default=None)
+    """어절을 구형하는 첫 형태소 ID"""
     end: Optional[int] = field(repr=True, compare=True, default=None)
+    """어절을 구형하는 끝 형태소 ID"""
 
 
 @dataclass(frozen=True)
@@ -55,12 +73,19 @@ class Ne:
     """개체명 정보 인식 결과"""
 
     id: Optional[int] = field(repr=True, compare=True, default=None)
+    """개체명 ID (출현 순서)"""
     text: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 어휘"""
     type: Optional[str] = field(repr=True, compare=True, default=None)
+    """개체명 타입"""
     begin: Optional[int] = field(repr=True, compare=True, default=None)
+    """개체명을 구성하는 첫 형태소의 ID"""
     end: Optional[int] = field(repr=True, compare=True, default=None)
+    """개체명을 구성하는 끝 형태소의 ID"""
     weight: Optional[float] = field(repr=True, compare=True, default=None)
+    """개체명 인식 결과 신뢰도"""
     common_noun: Optional[int] = field(repr=True, compare=True, default=None)
+    """고유명사인 경우 0 일반명사인 경우 1"""
 
 
 @dataclass(frozen=True)
@@ -68,11 +93,17 @@ class Dependency:
     """의존구문 분석 결과"""
 
     id: Optional[int] = field(repr=True, compare=True, default=None)
+    """어절의 ID (출현 순서)"""
     text: Optional[str] = field(repr=True, compare=True, default=None)
+    """의존구문 텍스트"""
     head: Optional[int] = field(repr=True, compare=True, default=None)
+    """부모 어절의 ID"""
     label: Optional[str] = field(repr=True, compare=True, default=None)
+    """의존관계"""
     mod: Optional[List[int]] = field(repr=True, compare=True, default=None)
+    """자식 어절들의 ID"""
     weight: Optional[float] = field(repr=True, compare=True, default=None)
+    """의존구문 분석 결과 신뢰도"""
 
 
 @dataclass(frozen=True)
@@ -94,9 +125,13 @@ class SrlArgument:
     """논항 정보"""
 
     type: Optional[str] = field(repr=True, compare=True, default=None)
+    """논항 타입 정보"""
     word_id: Optional[int] = field(repr=True, compare=True, default=None)
+    """논항 어절 ID"""
     text: Optional[str] = field(repr=True, compare=True, default=None)
+    """논항 대상 어절의 텍스트"""
     weight: Optional[float] = field(repr=True, compare=True, default=None)
+    """논항 분석에 대한 신뢰도"""
 
 
 @dataclass(frozen=True)
@@ -104,12 +139,17 @@ class Srl:
     """의미역 분석 결과"""
 
     verb: Optional[str] = field(repr=True, compare=True, default=None)
+    """대상 용언(predicate)"""
     sense: Optional[int] = field(repr=True, compare=True, default=None)
+    """용언에 대한 의미 번호"""
     word_id: Optional[int] = field(repr=True, compare=True, default=None)
+    """용언 어절 ID"""
     weight: Optional[float] = field(repr=True, compare=True, default=None)
+    """결과에 대한 신뢰도"""
     argument: Optional[List[Dict[str, Any]]] = field(
         repr=True, compare=True, default=None
     )
+    """논항 정보"""
 
     @property
     def Argument(self) -> List[SrlArgument]:
