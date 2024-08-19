@@ -84,7 +84,7 @@ class ImageClient(EtriRequest):
         keys = list(result["return_object"].keys())
         return [ObjectDetectResult(data=result["return_object"][key]) for key in keys]
 
-    async def face_deid(self, file_path: str):
+    async def face_deid(self, file_path: str) -> Optional[list[FaceDeIDResult]]:
         """
         ### - 얼굴 비식별화 API
         영상 내에 존재하는 얼굴 영역을 자동으로 검출하고 얼굴 영역 영상처리를 수행하여 개인 정보인 얼굴을 비식별화 처리를 하게 됩니다.\n
@@ -113,9 +113,9 @@ class ImageClient(EtriRequest):
         self, file_path: str, file_type: str = "auto"
     ) -> Optional[list[HumanStatusResult]]:
         """
-        ### - 얼굴 비식별화 API
-        영상 내에 존재하는 얼굴 영역을 자동으로 검출하고 얼굴 영역 영상처리를 수행하여 개인 정보인 얼굴을 비식별화 처리를 하게 됩니다.\n
-        본 기술은 타인이 포함된 영상을 외부에 공유 시 개인 정보를 보호할 수 있는 목적으로 활용될 수 있으며, 모든 얼굴이 아닌 특정 얼굴을 제외한 비식별화 용도로 응용될 수 있습니다.
+        ### - 사람 상태 이해 API
+        영상 내에 존재하는 모든 사람 영역을 자동으로 검출하고 해당 사람의 상태를 판단하여 사용자에게 그 결과를 출력해주게 됩니다. 
+        본 기술은 도심에서 주취, 기절 등과 같이 쓰러져 도움이 필요한 사람을 자동으로 검출하여 위험 상황 발생 전에 선제적으로 대응할 수 있는 시스템 개발에 사용 될 수 있습니다. 
 
         #### Parameter\n
         `file_path` : 사람 상태 이해를 수행하고자 하는 이미지의 경로.\n
@@ -174,6 +174,7 @@ class VideoClient(EtriRequest):
 
     async def video_parse(self, file_id: str) -> list[VideoParseResult]:
         """
+        ### - 장면 분할 API
         동영상에서 장면이 변화하는 시점을 탐지하여, 동영상을 썸네일로 요약하거나 편집을 용이하게 하는 포인트를 제공합니다.
         동영상의 각 프레임의 특성 추출 후 특성이 시간적으로 크게 변화하는 시점을 탐지하여 출력합니다.
 
@@ -197,6 +198,7 @@ class VideoClient(EtriRequest):
 
     async def video_parse_for_path(self, file_path: str) -> list[VideoParseResult]:
         """
+        ### - 장면 분할 API
         동영상에서 장면이 변화하는 시점을 탐지하여, 동영상을 썸네일로 요약하거나 편집을 용이하게 하는 포인트를 제공합니다.
         동영상의 각 프레임의 특성 추출 후 특성이 시간적으로 크게 변화하는 시점을 탐지하여 출력합니다.\n
 
