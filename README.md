@@ -10,8 +10,7 @@
 [<img src="https://img.shields.io/pypi/v/etripy.svg">](https://pypi.python.org/pypi/etripy)<br>
 누구나 손쉽게 ETRI에서 제공하는 오픈 API를 사용할 수 있어요!<br>
 > **동기 비동기 모두 지원합니다!**<br>
-> OPEN ETRI 언어처리 API의 모든 엔드포인트가 래핑되어 있습니다<br>
-> (추후 음성지능 및 시각지능도 업데이트 예정입니다!)<br>
+> OPEN ETRI API의 모든 엔드포인트가 래핑되어 있습니다<br>
 > [자세한 사용법은 여기를 참조해주세요!](https://etripydocs.notion.site/Etripy-0f76dc702a1b4f21b86d61cc5be77da6)<br>
 
 
